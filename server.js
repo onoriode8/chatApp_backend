@@ -36,10 +36,7 @@ server.use(errorController);
 //     console.log(`app is serving on http://localhost:${PORT}`);
 // })
 
-//USER_DB_PASSWORD = Tl1VeS5U4ealaM0x
-//DB_URL = mongodb+srv://onosmaster2:e9NWZzGmKgfabgtl@cluster0.e3pic.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-//DB_NAME = onosmaster2
-//DB_PASSWORD = e9NWZzGmKgfabgtl
+
 
 console.log("generated uuid", uuidv4())
 console.log("removed alphabetic character", uuidv4().replace(/\D/g, ""));
