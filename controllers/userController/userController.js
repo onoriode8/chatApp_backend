@@ -17,9 +17,12 @@ exports.signup = async (req, res, next) => {
         return res.status(402).json("Please enter a valid credentials");
     }
 
-    let existUser;
+    console.log("validate result", errors);
+
+    let existUser; 
     try {
         existUser = await User.findOne({email: email});
+        console.log("exist details", existUser)
     } catch(err) { 
         return res.status(500).json("server not responding") 
     };
@@ -33,14 +36,21 @@ exports.signup = async (req, res, next) => {
     const generatedToNumber = parseFloat(formatted);
 
     //encrypting the incoming password and generated OTP before storing on DB.
-    let hashedOTP;
     let hashedPassword;
     try {
         hashedPassword = await bcryptjs.hash(password, 12); 
-        hashedOTP = await bcryptjs.hash(generatedToNumber, 12); 
+        console.log("password Hashed", hashedPassword)
     } catch(err) {
         return res.status(500).json("server error"); 
     }; 
+
+    let hashedOTP;
+    try {
+        hashedOTP = await bcryptjs.hash(generatedNumber, 12);
+        console.log("otp hashed", hashedOTP);
+    } catch(err) {
+        return res.status(400).json("failed to register, try again");
+    }
 
     let date = new Date();
     let userFullname = email.split("@")[0];
@@ -55,7 +65,7 @@ exports.signup = async (req, res, next) => {
         email: email, 
         username: username,
         password: hashedPassword,
-        balance: 0.00,
+        balance: 0.00, //default account balance once register for the first time.
         fullname: userFullname,
         walletNumber: sliceToWalletNumber,
         friendsref: [],
@@ -69,8 +79,9 @@ exports.signup = async (req, res, next) => {
 
     let token;
     try { 
-        token = jwt.sign({ email, hashedPassword, username }, 
+        token = jwt.sign({ email, username }, 
             process.env.SECRET_TOKEN, {expiresIn: "1h"} );
+        console.log("LINE 74. TOKEN RESPONSE", token);
         if(token === undefined) {
             throw new Error("failed to create web token");
         }
@@ -81,7 +92,7 @@ exports.signup = async (req, res, next) => {
     if(!token) {
         return res.status(500).json("server error, token is empty");
     } 
-
+    return;
     let saveUser;
     try {
         saveUser = await createdUser.save()

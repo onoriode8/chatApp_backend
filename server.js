@@ -38,10 +38,10 @@ server.use(errorController);
 
 
 
-console.log("generated uuid", uuidv4())
-console.log("removed alphabetic character", uuidv4().replace(/\D/g, ""));
-console.log("slice to 10 digit number", uuidv4().replace(/\D/g, "").slice(0, 10));
-console.log(process.env.DB_NAME, process.env.DB_PASSWORD, process.env.DB_COLLECTION)
+// console.log("generated uuid", uuidv4())
+// console.log("removed alphabetic character", uuidv4().replace(/\D/g, ""));
+// console.log("slice to 10 digit number", uuidv4().replace(/\D/g, "").slice(0, 10));
+// console.log(process.env.DB_NAME, process.env.DB_PASSWORD, process.env.DB_COLLECTION)
 
 
 
