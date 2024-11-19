@@ -9,7 +9,6 @@ const userRoutes = require("./routes/user-routes");
 const errorController = require("./controllers/userController/userErrors/error");
 // const adminRoutes = require("./routes/admin-routes");
 
-const PORT =  5000;
  
 
 const server = express();
@@ -50,7 +49,7 @@ const DB_URL = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASSWORD}@
 mongoose.connect(DB_URL)
     .then(res => {
         server.listen(PORT, () => {
-            console.log(`app is serving on http://localhost:${PORT}`);
+            console.log(`app is serving on http://localhost:${process.env.PORT}`);
         })
     })
     .catch(err => { 
