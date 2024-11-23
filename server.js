@@ -48,10 +48,10 @@ const DB_URL = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASSWORD}@
 
 mongoose.connect(DB_URL)
     .then(res => {
-        server.listen(PORT, () => {
+        server.listen(process.env.PORT, () => {
             console.log(`app is serving on http://localhost:${process.env.PORT}`);
         })
     })
-    .catch(err => { 
-        console.log("error occur"); 
+    .catch(err => {
+        console.log("error occur", err.message); 
     })
