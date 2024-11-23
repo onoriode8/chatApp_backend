@@ -16,6 +16,9 @@ const server = express();
 server.use(express.json());
 
 
+server.set("trust proxy", true);
+
+
 server.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, PATCH, GET, DELETE");
@@ -24,6 +27,11 @@ server.use((req, res, next) => {
 }); 
 
 server.use(cors())
+
+// server.get("/", (req, res) => {
+//     console.log("testing ip address");
+//     res.send(req.headers['x-forwarded-for'] || req.connection.remoteAddress);
+// })
 
 server.use(userRoutes); 
 
@@ -41,7 +49,6 @@ server.use(errorController);
 // console.log("removed alphabetic character", uuidv4().replace(/\D/g, ""));
 // console.log("slice to 10 digit number", uuidv4().replace(/\D/g, "").slice(0, 10));
 // console.log(process.env.DB_NAME, process.env.DB_PASSWORD, process.env.DB_COLLECTION)
-
 
 
 const DB_URL = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASSWORD}@cluster0.e3pic.mongodb.net/${process.env.DB_COLLECTION}?retryWrites=true&w=majority&appName=Cluster0`

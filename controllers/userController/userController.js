@@ -63,6 +63,7 @@ exports.signup = async (req, res, next) => {
         friendsref: [],
         transactionHistory: [],
         image: [],
+        notification: [],
         OTP: hashedOTP,
         signupDate: date.toDateString()
     });
@@ -90,7 +91,24 @@ exports.signup = async (req, res, next) => {
         return res.status(500).json("Failed to create an account with your credentials");
     };
 
-    if(!saveUser) return res.status(500).json("Failed to create user")
+    if(!saveUser) return res.status(500).json("Failed to create user");
+
+    
+    // Retrieve the IP address
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+
+    //SAVE REGISTERED NOTIFICATION TO USER NOTIFICATION.
+    try {
+        const newlyLoggedInNotification = {
+            message: "You just created an account with Baseday Online Banking",
+            ip: ip,
+            date: date.toDateString()
+        }
+        saveUser.notification.push(newlyLoggedInNotification);
+        await saveUser.save();
+    } catch(err) {}
+
 
     let mailTransporter = nodemailer.createTransport({
          service: process.env.GOOGLE_SERVICE,
@@ -103,7 +121,7 @@ exports.signup = async (req, res, next) => {
     let mailOptions = {
         from: process.env.GOOGLE_USER,
         to: saveUser.email,
-        subject: `WELCOME ${saveUser.username} YOUR SIGIN WAS SUCCESSFUL`,
+        subject: `WELCOME ${saveUser.username} YOUR SIGIN WAS SUCCESSFUL on ${ip} ADDRESS`,
         text: `You can experience fast transaction with no fee added.`,
         html: '<b>Banking Wallet for Fast transaction and scalability.<b>'
       };
@@ -118,6 +136,7 @@ exports.signup = async (req, res, next) => {
          username: saveUser.username, token: token, image: saveUser.image});
 };
 
+//login function for existing users with email and password for authentication.
 exports.login = async (req, res, next) => {
     const { email, password } = req.body;
 
@@ -138,14 +157,14 @@ exports.login = async (req, res, next) => {
         return res.status(422).json("User not found, create an account instead");
     }
 
-    let hashPassword;
+    let hashedPassword;
     try {
-        hashPassword = await bcryptjs.compare(password, existEmail.password);
+        hashedPassword = await bcryptjs.compare(password, existEmail.password);
     } catch(err) {
-        return res.status(500).json("Failed");
+        return res.status(500).json("Failed"); 
     };
 
-    if(!hashPassword) {
+    if(!hashedPassword) {
         return res.status(403).json("wrong password, try again");
     };
 

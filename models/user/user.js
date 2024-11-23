@@ -10,6 +10,7 @@ const mongooseSchema = new mongoose.Schema({
     friendsref: [{ type: mongoose.Schema.Types.ObjectId, required: true, trim: true, ref: "Referrer" }],
     transactionHistory: [{ type: mongoose.Schema.Types.ObjectId, required: true, trim: true, ref: "TransactionHistory" }],
     image: [{ type: String, required: true }], //check for image storing as array.
+    notification: [],
     OTP: { type: String, required: true, trim: true }, 
     signupDate: { type: String, required: true }
 });
