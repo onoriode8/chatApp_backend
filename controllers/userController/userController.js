@@ -147,7 +147,8 @@ exports.login = async (req, res, next) => {
 
     let existEmail;
     try {
-        existEmail = await User.findOne({email: email});
+        existEmail = await User.findOne({ email })
+        // .populate(["friendsref", "image", "transactionHistory"])
     } catch(err) {
         return res.status(500).json("Server error");
     };
@@ -165,9 +166,13 @@ exports.login = async (req, res, next) => {
     };
 
     if(!hashedPassword) {
-        return res.status(403).json("wrong password, try again");
+        return res.status(403).json("wrong password, try again"); 
     };
 
+    //disable/undefine the password and OTP.
+    existEmail.password = undefined;
+    existEmail.OTP = undefined;
+    
     let token;
     try {
         token = jwt.sign({ userId: existEmail._id, email: existEmail.email},
@@ -176,7 +181,36 @@ exports.login = async (req, res, next) => {
         return res.status(500).json("Failed to create token");
     };
 
+    
+    //sending emails to login user and push notification to user;
+    let mailTransporter = nodemailer.createTransport({
+        service: process.env.GOOGLE_SERVICE,
+        auth: {
+           user: process.env.GOOGLE_USER,
+           pass: process.env.GOOGLE_USER_PASSWORD
+       }
+    }); 
+
+    let mailOptions = {
+       from: process.env.GOOGLE_USER,
+       to: existEmail.email,
+       subject: `WELCOME ${existEmail.username} YOUR SIGIN WAS SUCCESSFUL`,
+       text: `You can experience fast transaction with no fee added.`,
+       html: '<b>Banking Wallet for Fast transaction and scalability.<b>'
+    };
+
+    try {
+     await mailTransporter.sendMail(mailOptions, function(err, data) {
+       if (err) {} 
+     });
+    } catch(err) {}
+
     return res.status(200).json({
-        email: existEmail.email, id: existEmail._id, 
-        username: existEmail.username, token: token, image: existEmail.image});
-};
+        // email: existEmail.email, id: existEmail._id, 
+        // username: existEmail.username, token: token, image: existEmail.image,
+        // notification: existEmail.notification, 
+        // transactionHistory: existEmail.transactionHistory,
+        // friendsRef: existEmail.friendsref
+        existEmail, token: token
+    });
+}; 
