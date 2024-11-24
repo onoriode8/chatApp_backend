@@ -11,10 +11,10 @@ const { v4: uuidv4 } = require("uuid");
 exports.signup = async (req, res, next) => {
     const { email, username, password } = req.body;
 
-    const errors = validationResult(req); //used to validate the incoming request inside the body.
-    if(!errors.isEmpty()) {
-        return res.status(422).json("Please enter a valid credentials");
-    }
+    //const errors = validationResult(req); //used to validate the incoming request inside the body.
+    //if(!errors.isEmpty()) {
+      //  return res.status(422).json("Please enter a valid credentials");
+    //}
 
     let existUser; 
     let existUserName;
