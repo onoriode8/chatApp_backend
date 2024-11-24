@@ -52,12 +52,13 @@ exports.signup = async (req, res, next) => {
     const formattedToWalletNumber = generatedCharacter.replace(/\D/g, "");
     const sliceToWalletNumber = Number(formattedToWalletNumber.slice(0, 10));
 
+    const welcomeBonus = 5000;
     //creating a signup model for new users.
     const createdUser = new User({
         email: email, 
         username: username,
         password: hashedPassword,
-        balance: 0.00, //default account balance once register for the first time.
+        balance: welcomeBonus, //default account balance once register for the first time.
         fullname: userFullname,
         walletNumber: sliceToWalletNumber,
         friendsref: [],
@@ -133,6 +134,7 @@ exports.signup = async (req, res, next) => {
     } catch(err) {}
 
     return res.status(200).json({email: saveUser.email, id: saveUser._id,
+         walletNumber: saveUser.walletNumber,
          username: saveUser.username, token: token, image: saveUser.image});
 };
 

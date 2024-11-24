@@ -1,18 +1,24 @@
 const express = require("express");
 const { body } = require("express-validator")
 
-const userController = require("../controllers/userController/userController");
+const authentication = require("../controllers/userController/authentication");
+const transfer = require("../controllers/userController/transfer");
 // const resetPasswordController = require("../controllers/userController/reset-password");
 
  
 const router = express.Router();
  
 router.post("/signin", body("email").isEmail().normalizeEmail(),
-body("password").isLength({ min: 6 }), userController.login);  //passed done with this REST API 
+body("password").isLength({ min: 6 }), authentication.login);  //passed done with this REST API 
 
 router.post("/signup", body("email").isEmail().normalizeEmail(),
       body("password").isLength({ min: 6 }), 
-      body("username"), userController.signup);  //passed done with this REST API 
+      body("username"), authentication.signup);  //passed done with this REST API 
+
+
+//routes to transfer funds to other users on Baseday.
+router.patch("/transfer-fund", body("walletNumber"), body("fullname"), transfer.transferFund);
+
 
 //routes to edit user information and delete user account permanently.
 

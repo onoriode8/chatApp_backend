@@ -10,7 +10,7 @@ const transactionHistory = new mongoose.Schema({
     amountSent: { type: Number, required: true, trim: true },
     type: { type: String, required: true, trim: true },
     transactionDate: { type: String, required: true, trim: true },
-    transactionId: { type: String, required: true, trim: true },
+    description: { type: String },
     sessionId: { type: String, required: true, trim: true },
     status: { type: String, required: true, trim: true },
     creatorId: { type: mongoose.Schema.Types.ObjectId, required: true, trim: true, ref: "User" }
