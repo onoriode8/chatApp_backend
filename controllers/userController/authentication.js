@@ -13,7 +13,7 @@ exports.signup = async (req, res, next) => {
 
     const errors = validationResult(req); //used to validate the incoming request inside the body.
     if(!errors.isEmpty()) {
-        return res.status(402).json("Please enter a valid credentials");
+        return res.status(422).json("Please enter a valid credentials");
     }
 
     let existUser; 
