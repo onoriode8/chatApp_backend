@@ -28,9 +28,9 @@ server.use((req, res, next) => {
 
 server.use(cors())
 
-server.use("/", () => {
-    return res.status(200).json({ message: "Navigate to the rightful routes"});
-})
+// server.use("/", () => {
+//     return res.status(200).json({ message: "Navigate to the rightful routes"});
+// })
 
 // server.get("/", (req, res) => {
 //     console.log("testing ip address");
