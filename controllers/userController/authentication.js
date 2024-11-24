@@ -11,22 +11,22 @@ const { v4: uuidv4 } = require("uuid");
 exports.signup = async (req, res, next) => {
     const { email, username, password } = req.body;
 
-    //const errors = validationResult(req); //used to validate the incoming request inside the body.
-    //if(!errors.isEmpty()) {
-      //  return res.status(422).json("Please enter a valid credentials");
-    //}
+    const errors = validationResult(req); //used to validate the incoming request inside the body.
+    if(!errors.isEmpty()) {
+       return res.status(422).json("Please enter a valid credentials");
+    }
 
-    // let existUser; 
-    // let existUserName;
-    // try {
-    //     existUser = await User.findOne({email: email});
-    //     // existUserName = await User.findOne({ username: username })
-    // } catch(err) { 
-    //     return res.status(500).json("server not responding") 
-    // };
+    let existUser; 
+    let existUserName;
+    try {
+        existUser = await User.findOne({email: email});
+        existUserName = await User.findOne({ username: username })
+    } catch(err) { 
+        return res.status(500).json("server not responding") 
+    };
 
-    // if(existUser) return res.status(406).json(`user with ${existUser.email} already exist, login instead`)
-    // if(existUserName) return res.status(406).json(`${existUserName.username} already exist`);
+    if(existUser) return res.status(406).json(`user with ${existUser.email} already exist, login instead`)
+    if(existUserName) return res.status(406).json(`${existUserName.username} already exist`);
 
     //generated Random OTP in string. 
     const generateRandomCodeInString = Math.random() * 2;
