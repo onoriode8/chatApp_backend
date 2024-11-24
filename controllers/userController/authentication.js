@@ -16,16 +16,16 @@ exports.signup = async (req, res, next) => {
       //  return res.status(422).json("Please enter a valid credentials");
     //}
 
-    let existUser; 
+    // let existUser; 
     // let existUserName;
-    try {
-        existUser = await User.findOne({email: email});
-        // existUserName = await User.findOne({ username: username })
-    } catch(err) { 
-        return res.status(500).json("server not responding") 
-    };
+    // try {
+    //     existUser = await User.findOne({email: email});
+    //     // existUserName = await User.findOne({ username: username })
+    // } catch(err) { 
+    //     return res.status(500).json("server not responding") 
+    // };
 
-    if(existUser) return res.status(406).json(`user with ${existUser.email} already exist, login instead`)
+    // if(existUser) return res.status(406).json(`user with ${existUser.email} already exist, login instead`)
     // if(existUserName) return res.status(406).json(`${existUserName.username} already exist`);
 
     //generated Random OTP in string. 
