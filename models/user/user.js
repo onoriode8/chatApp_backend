@@ -7,8 +7,10 @@ const mongooseSchema = new mongoose.Schema({
     balance: { type: Number, required: true, trim: true },
     fullname: { type: String, required: true, trim: true },
     walletNumber: { type: Number, required: true, trim: true },
-    friendsref: [{ type: mongoose.Schema.Types.ObjectId, required: true, trim: true, ref: "Referrer" }],
-    transactionHistory: [{ type: mongoose.Schema.Types.ObjectId, required: true, trim: true, ref: "TransactionHistory" }],
+    friendsref: [{ type: mongoose.Schema.Types.ObjectId,
+         required: true, trim: true, ref: "Referrer" }],
+    transactionHistory: [{ type: mongoose.Schema.Types.ObjectId, 
+        required: true, trim: true, ref: "TransactionHistory" }],
     image: [{ type: String, required: true }], //check for image storing as array.
     notification: [],
     OTP: { type: String, required: true, trim: true }, 

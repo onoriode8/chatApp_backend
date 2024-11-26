@@ -13,11 +13,13 @@ const transactionHistory = new mongoose.Schema({
     description: { type: String },
     sessionId: { type: String, required: true, trim: true },
     status: { type: String, required: true, trim: true },
-    creatorId: { type: mongoose.Schema.Types.ObjectId, required: true, trim: true, ref: "User" }
+    creatorId: { type: mongoose.Schema.Types.ObjectId,
+         required: true, trim: true, ref: "User" }
 });
 
 
-const transactionHistoryModel = mongoose.model("TransactionHistory", transactionHistory);
+const transactionHistoryModel = 
+    mongoose.model("TransactionHistory", transactionHistory);
 
 
 module.exports = transactionHistoryModel;

@@ -19,10 +19,11 @@ exports.transferFund = async (req, res) => {
         return res.status(500).json("server error");
     } 
 
-    if(!createdUser || createdUser === null) return res.status(404).json("Can't perform a transaction.")
+    if(!createdUser || createdUser === null) {
+        return res.status(404).json("Can't perform a transaction.")
+    }
 
-    //console.log("CREATEDUSER DETAILS RETRIEVE", createdUser);
-
+    //function to retrieve receiver walletNumber and information.
     let recipient;
     try {
         recipient = await User.findOne({ walletNumber })
@@ -38,18 +39,16 @@ exports.transferFund = async (req, res) => {
     if(recipient.walletNumber !== walletNumber || recipient.fullname !== fullName){
         return res.status(400).json("wrong wallet number entered");
     }
-    // console.log(recipient.walletNumber, recipient.fullname);
-    // recipient.password = undefined;
 
-    if(createdUser.balance < amount) return res.status(426).json("Insufficient balance");
+    if(createdUser.balance < amount) {
+        return res.status(426).json("Insufficient balance");
+    }
     
     if(createdUser <= 9.99) return res.status(406).json("Funds must be above #10")
     
-    //return res.json(createdUser, recipient); 
-    // console.log(createdUser.balance, amount)
     const date = new Date();
 
-    //updated balance. 
+    //using Transaction to perform ACID ATOMICITY and update balance efficiently. 
     let session;
     try {
         session = await mongoose.startSession();
@@ -62,9 +61,6 @@ exports.transferFund = async (req, res) => {
         //Add money to recipient wallet balance
         recipient.balance += amount;
         await recipient.save({ session })
-
-        // return res.status(200).json(recipient);
-        // console.log(R)
 
         //generating a unique sessionId for successful transaction.
         const uuidGenerated = uuidv4();
@@ -86,30 +82,20 @@ exports.transferFund = async (req, res) => {
         })
         const transaction = await createdTransaction.save({ session });
         createdUser.transactionHistory.push(transaction);
+        const transactionMessage = {
+            message: `You made a successful transaction of #${amount} to ${recipient.fullname}.`
+        }
+        createdUser.notification.push(transactionMessage);
         await createdUser.save({ session });
         recipient.transactionHistory.push(transaction);
         await recipient.save({ session });
         await session.commitTransaction(); 
-
         return res.status(200).json({message: "Successful Transaction"});
-        // //transaction alert for recipient credited
-        // const createdTransactionRecipient = new TransactionHistoryModel({
-        //     senderName: createdUser.fullname ,
-        //     senderWalletNumber: createdUser.walletNumber,
-        //     receiverName: recipient.fullname,
-        //     receiverWalletNumber: recipient.walletNumber,
-        //     amountSent: amount,
-        //     type: "Credit",
-        //     transactionDate: date.toDateString(),
-        //     sessionId: sessionId,
-        //     status: "Successful",
-        //     creatorId: creatorId //remove soon because this user didn't create the transaction.
-        // })
-        // await createdTransactionRecipient.save({ session })
 
     } catch(err) {
         await session.abortTransaction()
+        await session.endSession()
         return res.status(403).json("Failed, server error");
     }
 
-}
+} 

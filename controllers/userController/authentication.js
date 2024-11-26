@@ -1,5 +1,3 @@
-const User = require("../../models/user/user");
-
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
@@ -7,6 +5,7 @@ const mongoose = require("mongoose");
 const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require("uuid");
 
+const User = require("../../models/user/user");
 
 exports.signup = async (req, res, next) => {
     const { email, username, password } = req.body;
@@ -20,11 +19,11 @@ exports.signup = async (req, res, next) => {
     let existUserName;
     try {
         existUser = await User.findOne({email: email});
-        existUserName = await User.findOne({ username: username })
+        existUserName = await User.findOne({ username: username }) 
     } catch(err) { 
         return res.status(500).json("server not responding") 
     };
-
+ 
     if(existUser) return res.status(406).json(`user with ${existUser.email} already exist, login instead`)
     if(existUserName) return res.status(406).json(`${existUserName.username} already exist`);
 
