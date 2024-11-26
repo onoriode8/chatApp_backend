@@ -133,7 +133,7 @@ exports.signup = async (req, res, next) => {
     } catch(err) {}
 
     return res.status(200).json({email: saveUser.email, id: saveUser._id,
-         walletNumber: saveUser.walletNumber,
+         walletNumber: saveUser.walletNumber, notification: saveUser.notification,
          username: saveUser.username, token: token, image: saveUser.image});
 };
 
