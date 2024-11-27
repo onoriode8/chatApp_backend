@@ -8,7 +8,7 @@ const { v4: uuidv4 } = require("uuid");
 const User = require("../../models/user/user");
 
 exports.signup = async (req, res, next) => {
-    const { email, username, password } = req.body;
+    const { email, username, password, phoneNumber } = req.body;
 
     const errors = validationResult(req); //used to validate the incoming request inside the body.
     if(!errors.isEmpty()) {
@@ -17,15 +17,19 @@ exports.signup = async (req, res, next) => {
 
     let existUser; 
     let existUserName;
+    let existUserNumber;
     try {
         existUser = await User.findOne({email: email});
         existUserName = await User.findOne({ username: username }) 
+        existUserNumber = await User.findOne({ phoneNumber: phoneNumber }) 
+
     } catch(err) { 
         return res.status(500).json("server not responding") 
     };
  
     if(existUser) return res.status(406).json(`user with ${existUser.email} already exist, login instead`)
     if(existUserName) return res.status(406).json(`${existUserName.username} already exist`);
+    if(existUserNumber) return res.status(406).json(`${existUserNumber.phoneNumber} already exist add new number`);
 
     //generated Random OTP in string. 
     const generateRandomCodeInString = Math.random() * 2;
@@ -59,6 +63,7 @@ exports.signup = async (req, res, next) => {
         password: hashedPassword,
         balance: welcomeBonus, //default account balance once register for the first time.
         fullname: userFullname,
+        phoneNumber: phoneNumber,
         walletNumber: sliceToWalletNumber,
         friendsref: [],
         transactionHistory: [],
@@ -133,13 +138,14 @@ exports.signup = async (req, res, next) => {
     } catch(err) {}
 
     return res.status(200).json({email: saveUser.email, id: saveUser._id,
+         phoneNumber: saveUser.phoneNumber,
          walletNumber: saveUser.walletNumber, notification: saveUser.notification,
          username: saveUser.username, token: token, image: saveUser.image});
 };
 
 //login function for existing users with email and password for authentication.
 exports.login = async (req, res, next) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
@@ -148,7 +154,7 @@ exports.login = async (req, res, next) => {
 
     let existEmail;
     try {
-        existEmail = await User.findOne({ email })
+        existEmail = await User.findOne({ username })
         // .populate(["friendsref", "image", "transactionHistory"])
     } catch(err) {
         return res.status(500).json("Server error");

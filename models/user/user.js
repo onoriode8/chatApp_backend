@@ -4,6 +4,7 @@ const mongooseSchema = new mongoose.Schema({
     username: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true },
     password: { type: String, required: true, trim: true },
+    phoneNumber: { type: Number, required: true, trim: true },
     balance: { type: Number, required: true, trim: true },
     fullname: { type: String, required: true, trim: true },
     walletNumber: { type: Number, required: true, trim: true },

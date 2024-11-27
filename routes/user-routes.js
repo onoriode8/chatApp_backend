@@ -8,11 +8,11 @@ const transfer = require("../controllers/userController/transfer");
  
 const router = express.Router();
  
-router.post("/signin", body("email").isEmail().normalizeEmail(),
+router.post("/signin", body("username"),
 body("password").isLength({ min: 6 }), authentication.login);  //passed done with this REST API 
 
 router.post("/signup", body("email").isEmail().normalizeEmail(),
-      body("password").isLength({ min: 6 }), 
+      body("password").isLength({ min: 6 }), body("phoneNumber"),
       body("username"), authentication.signup);  //passed done with this REST API 
 
 
