@@ -138,9 +138,11 @@ exports.signup = async (req, res, next) => {
     } catch(err) {}
 
     return res.status(200).json({email: saveUser.email, id: saveUser._id,
-         phoneNumber: saveUser.phoneNumber,
+         phoneNumber: saveUser.phoneNumber, balance: saveUser.balance,
          walletNumber: saveUser.walletNumber, notification: saveUser.notification,
-         username: saveUser.username, token: token, image: saveUser.image});
+         username: saveUser.username, token: token, image: saveUser.image,
+         signupDate: saveUser.signupDate
+        });
 };
 
 //login function for existing users with email and password for authentication.
