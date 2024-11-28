@@ -25,6 +25,10 @@ router.patch("/transfer-fund", body("walletNumber"), body("fullname"), transfer.
 //routes to fetch user details if the UI is refreshed.
 router.get("/user/:id", getUserDetails.getUser);
 
+
+//routes to fetch user transaction history with userId.
+router.get("/transaction_history/:id", getUserDetails.transactionHistory);
+
 //routes to edit user information and delete user account permanently.
 
 //reset pass logic below
