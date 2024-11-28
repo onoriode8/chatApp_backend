@@ -104,11 +104,13 @@ exports.signup = async (req, res, next) => {
 
 
     //SAVE REGISTERED NOTIFICATION TO USER NOTIFICATION.
+    const notificationId = uuidv4();
     try {
         const newlyLoggedInNotification = {
             message: "You just created an account with Baseday Online Banking",
             ip: ip,
-            date: date.toDateString()
+            date: date.toDateString(),
+            id: notificationId
         }
         saveUser.notification.push(newlyLoggedInNotification);
         await saveUser.save();
