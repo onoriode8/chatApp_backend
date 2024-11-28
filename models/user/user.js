@@ -7,6 +7,7 @@ const mongooseSchema = new mongoose.Schema({
     phoneNumber: { type: Number, required: true, trim: true },
     balance: { type: Number, required: true, trim: true },
     fullname: { type: String, required: true, trim: true },
+    referenceCode: { type: Number, required: true, trim: true },
     walletNumber: { type: Number, required: true, trim: true },
     friendsref: [{ type: mongoose.Schema.Types.ObjectId,
          required: true, trim: true, ref: "Referrer" }],
