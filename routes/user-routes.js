@@ -3,6 +3,8 @@ const { body } = require("express-validator")
 
 const authentication = require("../controllers/userController/authentication");
 const transfer = require("../controllers/userController/transfer");
+const getUserDetails = require("../controllers/userController/getUserDetails");
+
 // const resetPasswordController = require("../controllers/userController/reset-password");
 
  
@@ -19,6 +21,9 @@ router.post("/signup", body("email").isEmail().normalizeEmail(),
 //routes to transfer funds to other users on Baseday.
 router.patch("/transfer-fund", body("walletNumber"), body("fullname"), transfer.transferFund);
 
+
+//routes to fetch user details if the UI is refreshed.
+router.get("/user/:id", getUserDetails.getUser);
 
 //routes to edit user information and delete user account permanently.
 
