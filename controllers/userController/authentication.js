@@ -59,7 +59,7 @@ exports.signup = async (req, res, next) => {
     const generatedReferenceCode = uuidv4();
     const formattedReferenceCode = generatedReferenceCode.replace(/\D/g, "");
     const sliceFormatedReferenceCode = Number(formattedReferenceCode.slice(0, 8));
-    return res.status(200).json(sliceFormatedReferenceCode);
+    
     //creating a signup model for new users.
     const createdUser = new User({
         email: email, 
