@@ -216,11 +216,11 @@ exports.login = async (req, res, next) => {
     } catch(err) {}
 
     return res.status(200).json({
-        // email: existEmail.email, id: existEmail._id, 
-        // username: existEmail.username, token: token, image: existEmail.image,
-        // notification: existEmail.notification, 
-        // transactionHistory: existEmail.transactionHistory,
-        // friendsRef: existEmail.friendsref
-        existEmail, token: token
+        email: existEmail.email, id: existEmail._id,
+        phoneNumber: existEmail.phoneNumber, balance: existEmail.balance,
+        fullname: existEmail.fullname,
+        walletNumber: existEmail.walletNumber, notification: existEmail.notification,
+        username: existEmail.username, token: token, image: existEmail.image,
+        signupDate: existEmail.signupDate
     });
 }; 
