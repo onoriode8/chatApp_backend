@@ -36,9 +36,11 @@ exports.transferFund = async (req, res) => {
         return res.status(404).json("account doesn't exist.");
     }
  
-    // if(recipient.walletNumber !== walletNumber || recipient.fullname !== fullName){
-    //     return res.status(400).json("wrong wallet number entered");
-    // }
+    if(recipient.walletNumber !== walletNumber){
+        return res.status(400).json("wrong wallet number entered");
+    }
+
+    if(recipient.fullname !== fullName) return res.status(404).json("Name doesn't match.")
 
 
     if(createdUser.balance < amount) {
