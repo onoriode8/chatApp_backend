@@ -4,6 +4,7 @@ const { body } = require("express-validator")
 const authentication = require("../controllers/userController/authentication");
 const transfer = require("../controllers/userController/transfer");
 const getUserDetails = require("../controllers/userController/getUserDetails");
+const twoFactorAuthenticator = require('../controllers/userController/twoFactorAuthenticator');
 
 // const resetPasswordController = require("../controllers/userController/reset-password");
 
@@ -21,6 +22,8 @@ router.post("/signup", body("email").isEmail().normalizeEmail(),
 //routes to transfer funds to other users on Baseday.
 router.patch("/transfer-fund", body("walletNumber"), body("fullname"), transfer.transferFund);
 
+//routes to two factor authenticator system.
+router.get("/generate_code/:id", twoFactorAuthenticator.getGeneratedCode);
 
 //routes to fetch user details if the UI is refreshed.
 router.get("/user/:id", getUserDetails.getUser);
