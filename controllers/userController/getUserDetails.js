@@ -44,3 +44,26 @@ exports.transactionHistory = async (req, res, next) => {
     return res.status(200).json({ transactionHistory: transaction.transactionHistory })
 
  }
+
+
+ //function to retrieve user wallet number for confirmation if wallet exist.
+ exports.getWalletNumber = async (req, res, next) => {
+    const recipientWalletNumber = req.params.recipientWalletNumber;
+
+    let walletNumber;
+    try {
+        walletNumber = await User.findOne({ walletNumber: recipientWalletNumber }); 
+    } catch(err) {
+        return res.status(500).json("wallet number not found.");
+    }
+
+    if(!walletNumber) return res.status(404).json("This wallet number doesn't belong to anyone.")
+        
+    walletNumber.password = undefined;
+    walletNumber.OTP = undefined;
+
+    return res.status(200).json({
+        walletNumber: walletNumber.walletNumber, fullname: walletNumber.fullname
+    })
+ 
+}

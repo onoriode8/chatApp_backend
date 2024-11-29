@@ -29,6 +29,11 @@ router.get("/user/:id", getUserDetails.getUser);
 //routes to fetch user transaction history with userId.
 router.get("/transaction_history/:id", getUserDetails.transactionHistory);
 
+
+//routes to get user wallet Number.
+router.get("/get_wallet/:recipientWalletNumber", getUserDetails.getWalletNumber);
+
+
 //routes to edit user information and delete user account permanently.
 
 //reset pass logic below
