@@ -19,7 +19,8 @@ const mongooseSchema = new mongoose.Schema({
     image: [{ type: String, required: true }], //check for image storing as array.
     notification: [],
     OTP: { type: String, required: true, trim: true }, 
-    signupDate: { type: String, required: true }
+    signupDate: { type: String, required: true },
+    isMFA: { type: Boolean, required: true }
 });
 
 const userModel = mongoose.model("Users", mongooseSchema);

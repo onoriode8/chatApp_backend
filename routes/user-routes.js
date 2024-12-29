@@ -2,6 +2,7 @@ const express = require("express");
 const { body } = require("express-validator")
 
 const authentication = require("../controllers/userController/authentication");
+const JsonwebtokenMiddleWare = require("../middlewares/jwt");
 const transfer = require("../controllers/userController/transfer");
 const getUserDetails = require("../controllers/userController/getUserDetails");
 const twoFactorAuthenticator = require('../controllers/userController/twoFactorAuthenticator');
@@ -18,12 +19,17 @@ router.post("/signup", body("email").isEmail().normalizeEmail(),
       body("password").isLength({ min: 6 }), body("phoneNumber"),
       body("username"), authentication.signup);  //passed done with this REST API 
 
+//JSONWEBTOKEN MIDDLEWARE.
+router.use(JsonwebtokenMiddleWare);
 
 //routes to transfer funds to other users on Baseday.
 router.patch("/transfer-fund", body("walletNumber"), body("fullname"), transfer.transferFund);
 
 //routes to two factor authenticator system.
 router.get("/generate_code/:id", twoFactorAuthenticator.getGeneratedCode);
+
+//code entered.
+router.post("/submit_code", twoFactorAuthenticator.sendCode);
 
 //routes to fetch user details if the UI is refreshed.
 router.get("/user/:id", getUserDetails.getUser);

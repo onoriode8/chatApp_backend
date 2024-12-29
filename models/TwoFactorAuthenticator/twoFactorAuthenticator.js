@@ -9,6 +9,7 @@ const twoFactorAuthenticator = new mongoose.Schema({
     otpauth_url: { type: String, required: true, trim: true },
     qrCode: { type: String, required: true, trim: true },
     secret: { type: String, required: true, trim: true },
+    // code: { type: String },
     creatorId: { type: mongoose.Schema.Types.ObjectId,
          required: true, trim: true, ref: "User" }
 });

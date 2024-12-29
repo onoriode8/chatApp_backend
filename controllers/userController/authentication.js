@@ -75,13 +75,23 @@ exports.signup = async (req, res, next) => {
         image: [],
         notification: [],
         OTP: hashedOTP,
-        signupDate: date.toDateString()
+        signupDate: date.toDateString(),
+        isMFA: false
     });
 
 
+    let saveUser;
+    try {
+        saveUser = await createdUser.save();
+    } catch(err) {
+        return res.status(500).json("Failed to create an account with your credentials");
+    };
+
+    if(!saveUser) return res.status(500).json("Failed to create user");
+
     let token;
     try { 
-        token = jwt.sign({ email, username }, 
+        token = jwt.sign({ email, username, userId: saveUser._id }, 
             process.env.SECRET_TOKEN, {expiresIn: "1h"} );
         if(token === undefined) {
             throw new Error("failed to create web token");
@@ -93,15 +103,6 @@ exports.signup = async (req, res, next) => {
     if(!token || token === null) {
         return res.status(500).json("server error, token is empty");
     }
-
-    let saveUser;
-    try {
-        saveUser = await createdUser.save();
-    } catch(err) {
-        return res.status(500).json("Failed to create an account with your credentials");
-    };
-
-    if(!saveUser) return res.status(500).json("Failed to create user");
 
     
     // Retrieve the IP address
@@ -192,7 +193,8 @@ exports.login = async (req, res, next) => {
     
     let token;
     try {
-        token = jwt.sign({ userId: existEmail._id, email: existEmail.email},
+        token = jwt.sign({ userId: existEmail._id, username,
+            email: existEmail.email},
             process.env.SECRET_TOKEN, { expiresIn: "1h" });
     } catch(err) {
         return res.status(500).json("Failed to create token");
@@ -228,6 +230,6 @@ exports.login = async (req, res, next) => {
         fullname: existEmail.fullname, referenceCode: existEmail.referenceCode,
         walletNumber: existEmail.walletNumber, notification: existEmail.notification,
         username: existEmail.username, token: token, image: existEmail.image,
-        signupDate: existEmail.signupDate
+        isMFA: false, signupDate: existEmail.signupDate
     });
 }; 
