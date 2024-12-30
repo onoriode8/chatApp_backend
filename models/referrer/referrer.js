@@ -4,7 +4,9 @@ const mongoose = require("mongoose");
 
 const referrer = new mongoose.Schema({
     userReferredName: { type: String, required: true, trim: true },
-    creatorId: { type: mongoose.Schema.Types.ObjectId, required: true, trim: true, ref: "User" }
+    //can later increase the user earning for each referrer by amount #200.
+    creatorId: { type: mongoose.Schema.Types.ObjectId, 
+        required: true, trim: true, ref: "Users" }
 
 });
 

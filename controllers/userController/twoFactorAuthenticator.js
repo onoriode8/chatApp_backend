@@ -11,6 +11,10 @@ const TwoFactorAuthenticator = require("../../models/TwoFactorAuthenticator/twoF
 exports.getGeneratedCode = async (req, res) => {
     const userId = req.params.id;
 
+    const reqUserId = req.userData.userId;
+    
+    if(reqUserId !== userId) return res.status(400).json("User id mismatch");
+
     const secret = speakeasy.generateSecret({ name: "OnlineBankingWallet" });
 
     let saveGeneratedCode;
@@ -43,28 +47,35 @@ exports.getGeneratedCode = async (req, res) => {
 
     let session;
     try {
-        session = mongoose.StartSession()
-        await session.StartTransaction()
-        await session.commitTransaction()
-        saveTwoFactorAuthenticator.save({session})
+        session = await mongoose.StartSession()
+        session.StartTransaction()
+        await saveTwoFactorAuthenticator.save({session})
                 // .then((savedUser) => {
                 //     console.log("User saved successfully:", savedUser);
                 // })
                 // .catch((err) => {
                 //     console.error("Error saving user:", err);
                 // });
-        saveGeneratedCode.twoFactorAuthenticator.push(saveTwoFactorAuthenticator)
-        saveGeneratedCode.save({session});
+        saveGeneratedCode.twoFactorAuthenticator.push(saveTwoFactorAuthenticator);
+        await saveGeneratedCode.save({session});
+        await session.commitTransaction()
+        await session.endSession();
         return res.status(200).json({ secret: secret.base32, qrCode: dataURL });
     } catch(err) {
+        await session.abortTransaction();
+        await session.endSession();
         return res.status(500).json("Failed to stored 2MFA");
     }
     
 }
 
-
+//function to receive code from client
 exports.sendCode = async (req, res) => {
     const { code, userId } = req.body;
+
+    const reqUserId = req.userData.userId;
+
+    if(reqUserId !== userId) return res.status(400).json("User id mismatch");
 
     let data;
     try {
@@ -76,8 +87,12 @@ exports.sendCode = async (req, res) => {
     if(!data) {
         return res.status(404).json("not found")
     }
+    
+    //update isMFA boolean value below after verifying 
+    //the 2FMA code from client and save data.isMFA to backend properly.
 
+    //data.isMFA = true
     // data.TwoFactorAuthenticator.push(code)
-    return res.status(200).json("code added successfully");
+    return res.status(200).json({message:"code added successfully"}, data);
 }
  

@@ -74,6 +74,7 @@ exports.signup = async (req, res, next) => {
         transactionHistory: [],
         image: [],
         notification: [],
+        twoFactorAuthenticator: [],
         OTP: hashedOTP,
         signupDate: date.toDateString(),
         isMFA: false
@@ -199,7 +200,6 @@ exports.login = async (req, res, next) => {
     } catch(err) {
         return res.status(500).json("Failed to create token");
     };
-
     
     //sending emails to login user and push notification to user;
     let mailTransporter = nodemailer.createTransport({

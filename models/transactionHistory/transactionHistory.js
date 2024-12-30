@@ -14,7 +14,7 @@ const transactionHistory = new mongoose.Schema({
     sessionId: { type: String, required: true, trim: true },
     status: { type: String, required: true, trim: true },
     creatorId: { type: mongoose.Schema.Types.ObjectId,
-         required: true, trim: true, ref: "User" }
+         required: true, trim: true, ref: "Users" }
 });
 
 

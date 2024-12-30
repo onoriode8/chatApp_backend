@@ -11,7 +11,7 @@ const twoFactorAuthenticator = new mongoose.Schema({
     secret: { type: String, required: true, trim: true },
     // code: { type: String },
     creatorId: { type: mongoose.Schema.Types.ObjectId,
-         required: true, trim: true, ref: "User" }
+        required: true, trim: true, ref: "Users" }
 });
 
 

@@ -11,8 +11,14 @@ const JsonwebtokenMiddleWare = (req, res, next) => {
         }
         const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
         console.log("RESPONSE FROM DECODEDTOKEN line 13", decodedToken);
+        req.userData = {
+            userId: decodedToken.userId,
+            username: decodedToken.username,
+            email: decodedToken.email
+        }
+        next();
     } catch(err) {
-        return res.status(400).json("");
+        return res.status(400).json("You can't access this route.");
     }
 }
 

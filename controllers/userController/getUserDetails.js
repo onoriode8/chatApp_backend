@@ -5,6 +5,9 @@ const User = require("../../models/user/user");
 //function to get user credential from db.
 exports.getUser = async (req, res, next) => {
     const userId = req.params.id;
+    const reqUserId = req.userData.userId;
+    
+    if(reqUserId !== userId) return res.status(400).json("User id mismatch");
 
     let user;
     try {
@@ -28,6 +31,10 @@ exports.getUser = async (req, res, next) => {
 exports.transactionHistory = async (req, res, next) => {
     const userId = req.params.id;
 
+    const reqUserId = req.userData.userId;
+    
+    if(reqUserId !== userId) return res.status(400).json("User id mismatch");
+
     let transaction;
     try {
         transaction = await User.findById(userId).populate("transactionHistory");
@@ -49,6 +56,10 @@ exports.transactionHistory = async (req, res, next) => {
  //function to retrieve user wallet number for confirmation if wallet exist.
  exports.getWalletNumber = async (req, res, next) => {
     const recipientWalletNumber = req.params.recipientWalletNumber;
+    // const reqUserId = req.userData.userId;
+    
+    // if(reqUserId !== userId) return res.status(400).json("User id mismatch");
+
 
     let walletNumber;
     try {

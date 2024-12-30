@@ -9,6 +9,9 @@ const User = require("./../../models/user/user");
 
 exports.transferFund = async (req, res) => {
     const { walletNumber, fullName, amount, creatorId, description } = req.body;
+    // const reqUserId = req.userData.userId;
+    
+    // if(reqUserId !== userId) return res.status(400).json("User id mismatch");
 
     //function to retrieve the sender details.
     let createdUser;
