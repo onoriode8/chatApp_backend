@@ -29,7 +29,7 @@ router.patch("/transfer-fund", body("walletNumber"), body("fullname"), transfer.
 router.get("/generate_code/:id", twoFactorAuthenticator.getGeneratedCode);
 
 //code entered.
-router.post("/submit_code", twoFactorAuthenticator.sendCode);
+router.post("/verify/2fa/token", twoFactorAuthenticator.sendCode);
 
 //routes to fetch user details if the UI is refreshed.
 router.get("/user/:id", getUserDetails.getUser);

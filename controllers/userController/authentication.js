@@ -74,7 +74,7 @@ exports.signup = async (req, res, next) => {
         transactionHistory: [],
         image: [],
         notification: [],
-        twoFactorAuthenticator: [],
+        // twoFactorAuthenticator: {},
         OTP: hashedOTP,
         signupDate: date.toDateString(),
         isMFA: false

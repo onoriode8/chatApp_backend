@@ -1,13 +1,13 @@
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
-const mongoose = require("mongoose");
+const { startSession } = require("mongoose");
 
 const User = require("../../models/user/user");
 const TwoFactorAuthenticator = require("../../models/TwoFactorAuthenticator/twoFactorAuthenticator");
 
 
 
-// Generate and return secret & QR code
+// Generate and return secret & QR code for 2MFA
 exports.getGeneratedCode = async (req, res) => {
     const userId = req.params.id;
 
@@ -20,79 +20,77 @@ exports.getGeneratedCode = async (req, res) => {
     let saveGeneratedCode;
     try {
         saveGeneratedCode = await User.findById({ _id: userId })
-        .populate("twoFactorAuthenticator");
     } catch(err) {
         return res.status(500).json("server error");
     }
 
     if(!saveGeneratedCode._id) return res.status(404).json("id not found");
-   
 
-    let saveTwoFactorAuthenticator;
-    await QRCode.toDataURL(secret.otpauth_url, (err, dataURL) => {
-        if (err) {
-            return res.status(500).send("Failed to generate QR Code");
-        }
-        
-        saveTwoFactorAuthenticator = new TwoFactorAuthenticator({
-            ascii: secret.ascii,
-            hex: secret.hex,
-            base32: secret.base32,
-            otpauth_url: secret.otpauth_url,
-            creatorId: saveGeneratedCode._id,
-            qrCode: dataURL,
-            secret: secret,
-        })
-    });
-
-    let session;
+    let dataURL;
     try {
-        session = await mongoose.StartSession()
-        session.StartTransaction()
-        await saveTwoFactorAuthenticator.save({session})
-                // .then((savedUser) => {
-                //     console.log("User saved successfully:", savedUser);
-                // })
-                // .catch((err) => {
-                //     console.error("Error saving user:", err);
-                // });
-        saveGeneratedCode.twoFactorAuthenticator.push(saveTwoFactorAuthenticator);
-        await saveGeneratedCode.save({session});
-        await session.commitTransaction()
-        await session.endSession();
-        return res.status(200).json({ secret: secret.base32, qrCode: dataURL });
+        dataURL = await QRCode.toDataURL(secret.otpauth_url);
+        if (!dataURL) {
+            throw new Error("Failed to generate QR Code");
+        }
     } catch(err) {
-        await session.abortTransaction();
-        await session.endSession();
-        return res.status(500).json("Failed to stored 2MFA");
+        return res.status(500).json("Failed to generate QrCode.");
     }
+
+    return res.status(200).json({ secret: secret.base32, qrCode: dataURL });
     
 }
 
-//function to receive code from client
-exports.sendCode = async (req, res) => {
-    const { code, userId } = req.body;
 
-    const reqUserId = req.userData.userId;
+//function to verify 2MFA code from client
+exports.sendCode = async (req, res) => {
+    const { code, userId, secret } = req.body;
+ 
+    const reqUserId = req.userData.userId; 
 
     if(reqUserId !== userId) return res.status(400).json("User id mismatch");
 
     let data;
     try {
-        data = await User.findById({ _id: userId }).populate("TwoFactorAuthenticator");
+        data = await User.findById({ _id: userId }).populate("twoFactorAuthenticator");
     } catch(err) {
         return res.status(500).json("error occur");
     }
 
-    if(!data) {
-        return res.status(404).json("not found")
+    if(!data || !secret) {
+        return res.status(404).json("two factor authenticator not enabled.")
     }
-    
-    //update isMFA boolean value below after verifying 
-    //the 2FMA code from client and save data.isMFA to backend properly.
 
-    //data.isMFA = true
-    // data.TwoFactorAuthenticator.push(code)
-    return res.status(200).json({message:"code added successfully"}, data);
+    //function to verify generated 6 digits code from google authenticator app.
+    const verified = speakeasy.totp.verify({
+        secret: secret,
+        encoding: "base32",
+        token: code,
+        window: 1
+    })
+
+    if(!verified) return res.status(403).json("Invalid code")
+
+    const saveTwoFactorAuthenticator = new TwoFactorAuthenticator({
+        creatorId: data._id,
+        secret: secret
+    })
+
+    let session;
+    try {
+        session = await startSession()
+        session.startTransaction()
+        await saveTwoFactorAuthenticator.save({session});
+        data.twoFactorAuthenticator = saveTwoFactorAuthenticator;
+        data.isMFA = verified
+        await data.save({session})
+        await session.commitTransaction()
+        await session.endSession()
+    } catch(err) {
+        await session.abortTransaction()
+        await session.endSession()
+        return res.status(500).json("2MFA Failed")
+    }
+
+    return res.status(200).json({message:"code added successfully", verified});
 }
  
