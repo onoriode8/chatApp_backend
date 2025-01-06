@@ -60,6 +60,8 @@ exports.sendCode = async (req, res) => {
         return res.status(404).json("two factor authenticator not enabled.")
     }
 
+    if(data.isMFA === true) return res.status(422).json("This account already has 2FA verified")
+
     //function to verify generated 6 digits code from google authenticator app.
     const verified = speakeasy.totp.verify({
         secret: secret,
