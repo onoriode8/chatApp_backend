@@ -151,7 +151,7 @@ exports.signup = async (req, res, next) => {
          fullname: saveUser.fullname, referenceCode: saveUser.referenceCode,
          walletNumber: saveUser.walletNumber, notification: saveUser.notification,
          username: saveUser.username, token: token, image: saveUser.image,
-         signupDate: saveUser.signupDate
+         signupDate: saveUser.signupDate, isMFA: saveUser.isMFA
         });
 };
 
