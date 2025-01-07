@@ -230,6 +230,6 @@ exports.login = async (req, res, next) => {
         fullname: existEmail.fullname, referenceCode: existEmail.referenceCode,
         walletNumber: existEmail.walletNumber, notification: existEmail.notification,
         username: existEmail.username, token: token, image: existEmail.image,
-        isMFA: false, signupDate: existEmail.signupDate
+        isMFA: existEmail.isMFA, signupDate: existEmail.signupDate
     });
 }; 
