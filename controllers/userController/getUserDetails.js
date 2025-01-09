@@ -56,9 +56,10 @@ exports.transactionHistory = async (req, res, next) => {
  //function to retrieve user wallet number for confirmation if wallet exist.
  exports.getWalletNumber = async (req, res, next) => {
     const recipientWalletNumber = req.params.recipientWalletNumber;
-    // const reqUserId = req.userData.userId;
+
+    const reqUserId = req.userData.userId;
     
-    // if(reqUserId !== userId) return res.status(400).json("User id mismatch");
+    if(!reqUserId) return res.status(400).json("User id mismatch");
 
 
     let walletNumber;
