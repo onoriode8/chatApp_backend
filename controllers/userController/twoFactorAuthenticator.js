@@ -95,4 +95,43 @@ exports.sendCode = async (req, res) => {
 
     return res.status(200).json({message:"code added successfully", verified});
 }
+
+
+//verify authenticator code when signing in.
+exports.verifySignIn = async (req, res) => {
+    const { code, userId, secret } = req.body;
+
+    if(code.length !== 6) return res.status(422).json("token must be 6 digits")
+ 
+    const reqUserId = req.userData.userId; 
+
+    if(reqUserId !== userId) return res.status(400).json("User id mismatch");
+
+    let data;
+    try {
+        data = await User.findById({ _id: userId }).populate("twoFactorAuthenticator");
+    } catch(err) {
+        return res.status(500).json("error occur");
+    }
+
+    if(!data || !secret) {
+        return res.status(404).json("two factor authenticator not verified.")
+    }
+
+    if(secret !== data.twoFactorAuthenticator.secret) {
+        return res.status(400).json("Mismatch of user secret, try again.")
+    }
+
+    //function to verify generated 6 digits code from authenticator app.
+    const verified = speakeasy.totp.verify({
+        secret: secret,
+        encoding: "base32",
+        token: code,
+        window: 1
+    })
+
+    if(!verified) return res.status(403).json("Invalid code")
+
+    return res.status(200).json(verified)
+}
  

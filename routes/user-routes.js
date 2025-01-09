@@ -22,6 +22,9 @@ router.post("/signup", body("email").isEmail().normalizeEmail(),
 //JSONWEBTOKEN MIDDLEWARE.
 router.use(JsonwebtokenMiddleWare);
 
+//to verify authenticator code when user signin at first.
+router.post("/signin/verify/2fa/token", twoFactorAuthenticator.verifySignIn)
+
 //routes to transfer funds to other users on Baseday.
 router.patch("/transfer-fund", body("walletNumber"), body("fullname"), transfer.transferFund);
 

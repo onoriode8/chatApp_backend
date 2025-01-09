@@ -167,7 +167,7 @@ exports.login = async (req, res, next) => {
     let existEmail;
     try {
         existEmail = await User.findOne({ username })
-        // .populate(["friendsref", "image", "transactionHistory"])
+        .populate("twoFactorAuthenticator")
     } catch(err) {
         return res.status(500).json("Server error");
     };
@@ -175,6 +175,10 @@ exports.login = async (req, res, next) => {
 
     if(existEmail === null || undefined) {
         return res.status(422).json("User not found, create an account instead");
+    }
+
+    if(!existEmail.twoFactorAuthenticator.secret) {
+        return res.status(404).json("data not found")
     }
 
     let hashedPassword;
@@ -230,6 +234,7 @@ exports.login = async (req, res, next) => {
         fullname: existEmail.fullname, referenceCode: existEmail.referenceCode,
         walletNumber: existEmail.walletNumber, notification: existEmail.notification,
         username: existEmail.username, token: token, image: existEmail.image,
-        isMFA: existEmail.isMFA, signupDate: existEmail.signupDate
+        isMFA: existEmail.isMFA, signupDate: existEmail.signupDate,
+        secret: existEmail.twoFactorAuthenticator.secret
     });
 }; 
