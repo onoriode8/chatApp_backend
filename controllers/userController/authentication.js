@@ -167,11 +167,21 @@ exports.login = async (req, res, next) => {
     let existEmail;
     try {
         existEmail = await User.findOne({ username })
-        .populate("twoFactorAuthenticator")
+
+        if(existEmail === null || undefined) {
+            return res.status(422).json("User not found, create an account instead");
+        }
+
+        if(existEmail.isMFA === true) {
+            existEmail = await User.findOne({ username })
+            .populate("twoFactorAuthenticator")
+        } else if(existEmail.isMFA === false) {
+            existEmail = await User.findOne({ username })
+        } 
+
     } catch(err) {
         return res.status(500).json("Server error");
     };
-
 
     if(existEmail === null || undefined) {
         return res.status(422).json("User not found, create an account instead");
@@ -237,6 +247,6 @@ exports.login = async (req, res, next) => {
         walletNumber: existEmail.walletNumber, notification: existEmail.notification,
         username: existEmail.username, token: token, image: existEmail.image,
         isMFA: existEmail.isMFA, signupDate: existEmail.signupDate,
-        secret: existEmail.twoFactorAuthenticator.secret
+        secret: existEmail.isMFA ? existEmail.twoFactorAuthenticator.secret : null
     });
 }; 
