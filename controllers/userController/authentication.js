@@ -177,8 +177,10 @@ exports.login = async (req, res, next) => {
         return res.status(422).json("User not found, create an account instead");
     }
 
-    if(!existEmail.twoFactorAuthenticator.secret) {
-        return res.status(404).json("data not found")
+    if(existEmail.isMFA) {
+        if(!existEmail.twoFactorAuthenticator.secret) {
+            return res.status(404).json("data not found")
+        }
     }
 
     let hashedPassword;
