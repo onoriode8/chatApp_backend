@@ -1,7 +1,7 @@
 ## FINAL YEAR PROJECT BACKEND CODE
 ### DESIGN AND IMPLEMENTATION OF ONLINE BANKING WALLET WITH TWO FACTOR AUTHENTICATOR SYSTEM 
 
-## This project allows user to create an account and get a welcome bonus when registered for the first time. Each user can transfer funds from his/her account to an existing user in the app. User can also add 2Fa two factor authentication to secure user data and funds.
+## This project allows user to create an account and get a welcome bonus when registered for the first time. Each user can transfer funds from his/her account to an existing user in the app. User can also add 2Fa two factor authentication to secure user data and funds. It enables a transaction done with two factor authenticator system.
 
 
 #### INSTRUCTION TO START / Developer Instructions

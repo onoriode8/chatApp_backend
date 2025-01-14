@@ -12,6 +12,16 @@ exports.getUser = async (req, res, next) => {
     let user;
     try {
         user = await User.findById(userId);
+        if(user === null || undefined) {
+            return res.status(422).json("User not found.");
+        }
+
+        if(user.isMFA === true) {
+            user = await User.findById(userId)
+            .populate("twoFactorAuthenticator")
+        } else if(user.isMFA === false) {
+            user = await User.findById(userId)
+        } 
     } catch(err) {
         return res.status(500).json("server error in fetcing data");
     }
@@ -21,6 +31,7 @@ exports.getUser = async (req, res, next) => {
     user.password = undefined;
     user.OTP = undefined;
 
+    //user.twofactorAuthenticator.secret
 
     return res.status(200).json(user);
 
