@@ -86,14 +86,34 @@ exports.transferFund = async (req, res) => {
             status: "Successful",
             creatorId: creatorId
         })
+
+        //transaction history for credited user, thats the receiver.
+        const recipientTransaction = {
+            senderName: createdUser.fullname ,
+            senderWalletNumber: createdUser.walletNumber,
+            receiverName: recipient.fullname,
+            receiverWalletNumber: recipient.walletNumber,
+            amountSent: amount,
+            type: "Credit",
+            transactionDate: date.toDateString(),
+            description: description,
+            sessionId: sessionId,
+            status: "Successful"
+        }
         const transaction = await createdTransaction.save({ session });
         createdUser.transactionHistory.push(transaction);
         const transactionMessage = {
-            message: `You made a successful transaction of #${amount} to ${recipient.fullname}.`
+            message: `You made a successful transaction of
+             #${amount} to ${recipient.fullname} on account ${recipient.walletNumber}.`
         }
         createdUser.notification.push(transactionMessage);
         await createdUser.save({ session });
-        recipient.transactionHistory.push(transaction);
+        recipient.transactionHistory.push(recipientTransaction);
+        const recipientTransactionMessage = {
+            message: `Your account just got credited with 
+            #${amount} from ${createdUser.fullname} sender wallet ${createdUser.walletNumber}.`
+        }
+        recipient.notification.push(recipientTransactionMessage)
         await recipient.save({ session });
         await session.commitTransaction(); 
         return res.status(200).json({message: "Successful Transaction"});
