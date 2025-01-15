@@ -147,7 +147,8 @@ exports.signup = async (req, res, next) => {
     } catch(err) {}
 
     return res.status(200).json({email: saveUser.email, id: saveUser._id,
-         phoneNumber: saveUser.phoneNumber, balance: saveUser.balance,
+         phoneNumber: saveUser.phoneNumber, 
+        //  balance: saveUser.balance,
          fullname: saveUser.fullname, referenceCode: saveUser.referenceCode,
          walletNumber: saveUser.walletNumber, notification: saveUser.notification,
          username: saveUser.username, token: token, image: saveUser.image,
@@ -242,7 +243,8 @@ exports.login = async (req, res, next) => {
 
     return res.status(200).json({
         email: existEmail.email, id: existEmail._id,
-        phoneNumber: existEmail.phoneNumber, balance: existEmail.balance,
+        phoneNumber: existEmail.phoneNumber, 
+        // balance: existEmail.balance,
         fullname: existEmail.fullname, referenceCode: existEmail.referenceCode,
         walletNumber: existEmail.walletNumber, notification: existEmail.notification,
         username: existEmail.username, token: token, image: existEmail.image,
