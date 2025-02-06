@@ -241,6 +241,7 @@ exports.login = async (req, res, next) => {
      });
     } catch(err) {}
 
+    console.log(req.session)
     return res.status(200).json({
         email: existEmail.email, id: existEmail._id,
         phoneNumber: existEmail.phoneNumber, 

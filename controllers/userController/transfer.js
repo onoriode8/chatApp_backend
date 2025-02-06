@@ -103,15 +103,15 @@ exports.transferFund = async (req, res) => {
         const transaction = await createdTransaction.save({ session });
         createdUser.transactionHistory.push(transaction);
         const transactionMessage = {
-            message: `You made a successful transaction of
-             #${amount} to ${recipient.fullname} on account ${recipient.walletNumber}.`
+            message: `You made a successful transaction of #${amount} to ${recipient.fullname} on account ${recipient.walletNumber}.`,
+            id: uuidv4()
         }
         createdUser.notification.push(transactionMessage);
         await createdUser.save({ session });
         recipient.transactionHistory.push(recipientTransaction);
         const recipientTransactionMessage = {
-            message: `Your account just got credited with 
-            #${amount} from ${createdUser.fullname} sender wallet ${createdUser.walletNumber}.`
+            message: `Your account just got credited with #${amount} from ${createdUser.fullname} sender wallet ${createdUser.walletNumber}.`,
+            id: uuidv4()
         }
         recipient.notification.push(recipientTransactionMessage)
         await recipient.save({ session });

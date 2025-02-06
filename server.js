@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 require("dotenv").config();
 const cors = require("cors")
+const expressSession = require("express-session")
 
 
 const userRoutes = require("./routes/user-routes");
@@ -12,7 +13,12 @@ const errorController = require("./controllers/userController/userErrors/error")
 const server = express();
  
 server.use(express.json());
-
+server.use(expressSession({
+    saveUninitialized: false,
+    resave: false,
+    secret: process.env.SESSION_SECRET,
+    cookie: { secure: true } //change secure to true after testing the false value.
+}))
 
 server.set("trust proxy", true);
 
