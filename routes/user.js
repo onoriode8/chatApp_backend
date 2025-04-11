@@ -5,6 +5,7 @@ import { body, check } from 'express-validator'
 import upload from '../middleware/file-upload.js'
 import { signup, signin } from '../controllers/auth.js'
 import { getUser, updateProfile, getRegisteredUsers } from '../controllers/getDetails.js'
+import { getConversations, sendMessage } from '../controllers/message.js'
 import AuthorizationMiddleware from "../middleware/auth.js"
 
 
@@ -32,5 +33,17 @@ router.get("/users/:id",
 //router to update new photo
 router.patch("/user/update/profile", AuthorizationMiddleware,
     upload.single("updateProfile"), updateProfile)
+
+//router to get server message from sender & receiver.
+//route is /user/get/server/message
+router.get("/get/server/message",
+    AuthorizationMiddleware, getConversations)
+
+
+//router to send message to server
+//route is /user/send/message
+router.post("/send/message", 
+    AuthorizationMiddleware,
+     check("message"), sendMessage)
 
 export default router;
