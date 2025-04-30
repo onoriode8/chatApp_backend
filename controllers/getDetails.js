@@ -11,7 +11,7 @@ export const getUser = async (req, res) => {
         if(!user) {
             return res.status(404).json("Not found")
         }
-        console.log("GetUser")
+ 
         return res.status(200).json(user)
     } catch(err) {
         return res.status(500).json("Server error")
@@ -26,8 +26,9 @@ export const getRegisteredUsers = async (req, res) => {
         const users = await User.find().select("-password")
         if(!users) return res.status(404).json("Users not found")
         if(userId !== id) return res.status(400).json("You can't access this route")
-        console.log("GetRegisteredUser")
-        return res.status(200).json(users)
+
+        const user = users.filter(user => user._id.toString() !== userId)
+        return res.status(200).json(user)
     } catch(err) {
         res.status(500).json("error occur")
     }
@@ -36,6 +37,7 @@ export const getRegisteredUsers = async (req, res) => {
 export const updateProfile = async (req, res) => {
     const userId = req.userId.id
     const file = req.file
+    console.log(req.file)
     if(!userId && !file) return res.status(404).json("Invalid info")
     
     try {

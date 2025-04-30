@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 const fileUpload = multer({
     storage: multer.diskStorage({
         destination: (req, file, cb) => {
-            cb(null, 'uploads')
+            cb(null, 'uploads/images')
         },
         filename: (req, file, cb) => {
             const extension = file.mimetype.split("/")[1];

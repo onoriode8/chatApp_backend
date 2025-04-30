@@ -10,13 +10,7 @@ const messageSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Users", required: true
     },
-    conversation: [
-        // { type: String, required: true, trim: true },
-        // { 
-        //     type: mongoose.Schema.Types.ObjectId, 
-        //     ref: "Users"
-        // }
-    ]
+    conversation: []
 })
 
 const messageModel = mongoose.model("Conversations", messageSchema)

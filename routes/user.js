@@ -36,13 +36,13 @@ router.patch("/user/update/profile", AuthorizationMiddleware,
 
 //router to get server message from sender & receiver.
 //route is /user/get/server/message
-router.get("/get/server/message",
+router.get("/get/server/message/:creatorId/:receiverId",
     AuthorizationMiddleware, getConversations)
 
 
 //router to send message to server
 //route is /user/send/message
-router.post("/send/message", 
+router.patch("/send/message/:creatorId/:receiverId", 
     AuthorizationMiddleware,
      check("message"), sendMessage)
 
