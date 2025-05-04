@@ -6,7 +6,7 @@
 ### Developed and deployed a full-stack chat application using the MERN stack.
 ### This project allows user to chat with any existing users in realtime with help of socket.io
 ### Built Restful APIs with Express and MongoDB, implemented real-time chat using Socket.io.
-### Imporved app performance by optimizing React components and backend queries.
+### Improved app performance by optimizing React components and backend queries.
 ### Integrated authentication with JWT.
 ### Deployed Frontend application using Vercel and Backend with Render
 

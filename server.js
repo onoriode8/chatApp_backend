@@ -5,6 +5,8 @@ import "dotenv/config.js"
 import fs from 'fs'
 import path from 'path'
 
+
+import { init } from './socket.io.js'
 import userRoutes from './routes/user.js'
 
 const server = express();
@@ -37,9 +39,17 @@ server.use((error, req, res, next) => {
 
 mongoose.connect(process.env.DB_URL)
     .then(res => {
-        server.listen(process.env.PORT, () => {
+        const httpServer = server.listen(process.env.PORT, () => {
             console.log(`app is serving on http://localhost:${process.env.PORT}`);
         })
+        const io = init(httpServer)
+        io.on("connection", socket => {
+            console.log("Connected", socket.id)
+            socket.on("disconnect", () => {
+                console.log(`${socket.id} Disconnected`)
+            })
+        })
+       
     })
     .catch(err => {
         console.log("error occur", err.message); 

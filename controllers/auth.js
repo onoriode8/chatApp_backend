@@ -1,11 +1,9 @@
 import { validationResult } from 'express-validator'
 import bcryptjs from 'bcryptjs'
 import JsonWebToken from 'jsonwebtoken'
-// import Iplocation from 'ip-location'
 import fs from 'fs'
 
 import User from '../models/user.js'
-import ipLocation from 'ip-location'
 
 
 export const signup = async (req, res) => {
@@ -46,9 +44,7 @@ export const signup = async (req, res) => {
         //         throw new Error(err)
         //     }
         // })
-        ipLocation("test.com", (err, data) => {
-            console.log("LOCATION", data)
-        })
+        
         return res.status(201).json({ id: user._id, token })
     } catch(err) {
         // fs.unlink(req.file.path, (err) => {
