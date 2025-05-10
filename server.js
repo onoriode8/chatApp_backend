@@ -6,7 +6,7 @@ import fs from 'fs'
 import path from 'path'
 
 
-import { init } from './socket.io.js'
+import { init, socketId } from './socket.io.js'
 import userRoutes from './routes/user.js'
 
 const server = express();
@@ -40,11 +40,18 @@ server.use((error, req, res, next) => {
 mongoose.connect(process.env.DB_URL)
     .then(res => {
         const httpServer = server.listen(process.env.PORT, () => {
-            console.log(`app is serving on http://localhost:${process.env.PORT}`);
+            {process.env.NODE_ENV === "development" ? 
+                console.log(
+                    `app is serving on http://localhost:${process.env.PORT}`
+                ) : console.log("RUNNING")
+            }
         })
+        
         const io = init(httpServer)
+       
         io.on("connection", socket => {
             console.log("Connected", socket.id)
+            socketId(socket.id)
             socket.on("disconnect", () => {
                 console.log(`${socket.id} Disconnected`)
             })
@@ -52,5 +59,7 @@ mongoose.connect(process.env.DB_URL)
        
     })
     .catch(err => {
-        console.log("error occur", err.message); 
+        if(process.env.NODE_ENV === "development") {
+            console.log("error occur", err.message); 
+        }
     })

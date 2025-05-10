@@ -1,5 +1,6 @@
 import { validationResult } from "express-validator";
 import { v4 as uuidv4 } from 'uuid'
+import { getIo, getSocketClientId } from '../socket.io.js';
 
 
 import Message from "../models/message.js";
@@ -88,13 +89,18 @@ export const sendMessage = async (req, res) => {
       time: time
     }
 
+    const id = getSocketClientId()
+
     if(!conversation) {
       const createdConversation = new Message({
           creatorId: creatorId,  
           receiverId: receiverId,
           conversation: [messagesCreated]
       })
-     
+      
+      getIo().to(id).emit("message", {
+        conversation: createdConversation
+      })
       await createdConversation.save()
       existingSender.messages.push(createdConversation._id)
       await existingSender.save()
@@ -103,12 +109,15 @@ export const sendMessage = async (req, res) => {
 
     conversation.conversation.push(messagesCreated)
 
+    //emit socket event to users.
+    getIo().emit("message", {
+      conversation
+    })
+
     await conversation.save() 
-    //send socket.io message back to the frontend
-   
-    return res.status(201).json(conversation)
+    
+    return res.status(201).json(conversation) 
   } catch (err) {
-    // console.log(err.message && err.name)
     return res.status(500).json("Internal Server Error");
   }
 };

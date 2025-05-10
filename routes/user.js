@@ -43,7 +43,6 @@ router.get("/get/server/message/:creatorId/:receiverId",
 //router to send message to server
 //route is /user/send/message
 router.patch("/send/message/:creatorId/:receiverId", 
-    AuthorizationMiddleware,
-     check("message"), sendMessage)
+    AuthorizationMiddleware, check("message"), sendMessage)
 
 export default router;
