@@ -50,10 +50,10 @@ mongoose.connect(process.env.DB_URL)
         const io = init(httpServer)
        
         io.on("connection", socket => {
-            console.log("Connected", socket.id)
+            // console.log("Connected", socket.id)
             socketId(socket.id)
             socket.on("disconnect", () => {
-                console.log(`${socket.id} Disconnected`)
+                // console.log(`${socket.id} Disconnected`)
             })
         })
        
