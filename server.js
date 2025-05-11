@@ -14,7 +14,8 @@ const server = express();
 server.use(express.json());
 
 server.use(cors({
-    origin: process.env.FRONTEND_PORT
+    origin: process.env.FRONTEND_PORT,
+    methods: ["GET, POST, PATCH, DELETE, PUT"]
 }))
 
 
