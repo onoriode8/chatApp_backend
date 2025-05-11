@@ -13,7 +13,10 @@ const server = express();
  
 server.use(express.json());
 
-server.use(cors())
+server.use(cors({
+    origin: process.env.FRONTEND_PORT
+}))
+
 
 //serves image file dynamically.
 server.use("/uploads/images",
