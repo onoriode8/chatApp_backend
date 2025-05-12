@@ -30,7 +30,7 @@ export const signup = async (req, res) => {
         }
         const fullname = email.split("@")[0]
         const hashedPassword = await bcryptjs.hash(password, 12)
-
+        if(!req.file.path) return res.status(404).json("File is empty.")
         const createdUser = new User({
             email: email,
             password: hashedPassword,
