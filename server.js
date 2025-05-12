@@ -36,7 +36,7 @@ server.use((req, res) => {
 server.use((error, req, res, next) => {
     if(req.file) {
         fs.unlink(req.file.path, (err) => {
-            console.log('File deleted.')
+            console.log('File deleted.');
         })
     }
 })

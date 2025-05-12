@@ -8,7 +8,8 @@ import User from '../models/user.js'
 
 export const signup = async (req, res) => {
     const { email, password } = req.body
-   
+
+    email.toLowerCase()
     const result = validationResult(req)
     if(!result.isEmpty()) {
         for(const error of result.errors) {
@@ -17,9 +18,11 @@ export const signup = async (req, res) => {
             //         throw new Error(err)
             //     }
             // })
+
             return res.status(422).json(`${error.path} is ${error.msg}`)
         }
     }
+
     try {
         const existingUser = await User.findOne({email})
         if(existingUser) {
@@ -27,6 +30,7 @@ export const signup = async (req, res) => {
         }
         const fullname = email.split("@")[0]
         const hashedPassword = await bcryptjs.hash(password, 12)
+
         const createdUser = new User({
             email: email,
             password: hashedPassword,
@@ -36,6 +40,7 @@ export const signup = async (req, res) => {
         })
 
         const user = await createdUser.save()
+
         const token = JsonWebToken.sign(
             { id: user._id, email: user.email },
              process.env.SECRET_TOKEN, {expiresIn: "1h"})
@@ -44,6 +49,7 @@ export const signup = async (req, res) => {
         //         throw new Error(err)
         //     }
         // })
+        if(!token) return res.status(400).json("Token is empty.")
         
         return res.status(201).json({ id: user._id, token })
     } catch(err) {
@@ -52,6 +58,7 @@ export const signup = async (req, res) => {
         //         throw new Error(err)
         //     }
         // })
+
         return res.status(500).json("Server is down")
     }
 

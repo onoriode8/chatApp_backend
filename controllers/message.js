@@ -36,7 +36,6 @@ export const getConversations = async (req, res) => {
       })
       const pushArray = [];
       pushArray.push(conversation)
-      // console.log("LINE 38 CONVERSATION", pushArray)
       return res.status(200).json(pushArray) 
     }
     return res.status(200).json(creatorUser.messages);//return an array of messages.
@@ -49,7 +48,6 @@ export const sendMessage = async (req, res) => {
   const { message } = req.body;
   const userId = req.userId.id;
   const { creatorId, receiverId } = req.params
-    // console.log(req.body, req.params)
   const result = validationResult(req);
   if (!result.isEmpty()) {
     for (const error of result.errors) {
