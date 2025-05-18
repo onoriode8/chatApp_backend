@@ -96,7 +96,7 @@ export const sendMessage = async (req, res) => {
           conversation: [messagesCreated]
       })
       
-      getIo().to(id).emit("message", {
+      getIo().emit("message", {
         conversation: createdConversation
       })
       await createdConversation.save()
