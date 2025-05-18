@@ -14,7 +14,7 @@ const server = express();
 server.use(express.json());
 
 server.use(cors({
-    origin: process.env.FRONTEND_PORT,
+    origin: [process.env.FRONTEND_PORT, "http://localhost:3000"],
     methods: ["GET, POST, PATCH, DELETE, PUT"]
 }))
 
@@ -29,7 +29,7 @@ server.use("/user", userRoutes)
 
 
 server.use((req, res) => {
-    return res.status(404).json("Page not found")
+    return res.status(404).json({})
 })
 
 //routes to catch server error.
