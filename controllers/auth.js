@@ -35,7 +35,7 @@ export const signup = async (req, res) => {
             email: email,
             password: hashedPassword,
             fullname,
-            profile: req.file.path,
+            profile: process.env.FRONTEND_PORT + req.file.path,
             messages: []
         })
 
@@ -77,6 +77,7 @@ export const signin = async (req, res) => {
         if(!user) return res.status(404).json("User not found")
         const isValid = await bcryptjs.compare(password, user.password)
         if(!isValid) return res.status(401).json("Invalid credentials entered!")
+        user.password = undefined;
         const token = JsonWebToken.sign(
             { email: user.email, id: user._id}, 
             process.env.SECRET_TOKEN, {expiresIn: "1hr"})
