@@ -35,7 +35,7 @@ export const signup = async (req, res) => {
             email: email,
             password: hashedPassword,
             fullname,
-            profile: `${process.env.FRONTEND_PORT}/uploads/images/${req.file.filename}`,
+            profile: `${process.env.BACKEND_URL}/uploads/images/${req.file.filename}`,
             messages: []
         })
 
