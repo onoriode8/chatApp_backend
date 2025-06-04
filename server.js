@@ -4,6 +4,10 @@ import cors from "cors"
 import "dotenv/config.js"
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
+import helmet from 'helmet'
+import compression from 'compression'
+import morgan from 'morgan'
 
 
 import { init, socketId } from './socket.io.js'
@@ -11,11 +15,22 @@ import userRoutes from './routes/user.js'
 
 const server = express();
  
+server.use(helmet()) 
+server.use(compression())
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const accessLogStream = fs.createWriteStream(
+    path.join(__dirname, "access.log"),
+    { flats: "a" }
+)
+
+server.use(morgan("combined", { stream: accessLogStream }))
 server.use(express.json());
 
 server.use(cors({
     origin: process.env.FRONTEND_PORT, 
-    methods: ["GET, POST, PATCH, DELETE, PUT"]
+    methods: ["GET, POST, PATCH, DELETE, PUT"],
+    credentials: true
 }))
 
 
@@ -41,6 +56,7 @@ server.use((error, req, res, next) => {
     }
 })
 
+// console.log()
 mongoose.connect(process.env.DB_URL)
     .then(res => {
         const httpServer = server.listen(process.env.PORT, () => {
@@ -54,16 +70,13 @@ mongoose.connect(process.env.DB_URL)
         const io = init(httpServer)
        
         io.on("connection", socket => {
-            // console.log("Connected", socket.id)
             socketId(socket.id)
             socket.on("disconnect", () => {
-                // console.log(`${socket.id} Disconnected`)
             })
         })
        
     })
     .catch(err => {
         if(process.env.NODE_ENV === "development") {
-            console.log("error occur", err.message); 
         }
     })
