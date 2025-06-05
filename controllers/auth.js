@@ -13,12 +13,6 @@ export const signup = async (req, res) => {
     const result = validationResult(req)
     if(!result.isEmpty()) {
         for(const error of result.errors) {
-            // fs.unlink(req.file.path, (err) => {
-            //     if(err) {
-            //         throw new Error(err)
-            //     }
-            // })
-
             return res.status(422).json(`${error.path} is ${error.msg}`)
         }
     }
@@ -36,7 +30,8 @@ export const signup = async (req, res) => {
             password: hashedPassword,
             fullname,
             profile: `${process.env.BACKEND_URL}/uploads/images/${req.file.filename}`,
-            messages: []
+            messages: [],
+            blockUser: []
         })
 
         const user = await createdUser.save()
@@ -44,20 +39,10 @@ export const signup = async (req, res) => {
         const token = JsonWebToken.sign(
             { id: user._id, email: user.email },
              process.env.SECRET_TOKEN, {expiresIn: "1h"})
-        // fs.unlink(req.file.path, (err) => {
-        //     if(err) {
-        //         throw new Error(err)
-        //     }
-        // })
         if(!token) return res.status(400).json("Token is empty.")
         
         return res.status(201).json({ id: user._id, token })
     } catch(err) {
-        // fs.unlink(req.file.path, (err) => {
-        //     if(err) {
-        //         throw new Error(err)
-        //     }
-        // })
 
         return res.status(500).json("Server is down")
     }

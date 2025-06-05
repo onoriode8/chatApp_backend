@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
     messages: [ 
         { type: mongoose.Schema.Types.ObjectId,
          ref: "Conversations"} 
-    ]
+    ],
+    blockUser: []
 })
 
 const userModel = new mongoose.model("Users", userSchema)

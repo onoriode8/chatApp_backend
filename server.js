@@ -35,8 +35,7 @@ server.use(cors({
 
 
 //serves image file dynamically.
-server.use("/uploads/images",
-     express.static(path.join("uploads", "images")))
+server.use("/uploads/images", express.static(path.join(__dirname, "uploads", "images")))
 
 server.use("/user", userRoutes)
 

@@ -22,12 +22,21 @@ export const getRegisteredUsers = async (req, res) => {
     const userId = req.userId.id
     const id = req.params.id
     if(!userId) return res.status(404).json("Id not found")
+
     try {
-        const users = await User.find().select("-password")
-        if(!users) return res.status(404).json("Users not found")
+        const [ users, userData ] = await Promise.all([
+            User.find().select("-password"),
+            User.findById(userId).select("-password")
+        ])
+
+        if(!users && !userData) {
+            return res.status(404).json("Users not found")
+        }
+
         if(userId !== id) return res.status(400).json("You can't access this route")
 
         const user = users.filter(user => user._id.toString() !== userId)
+        // user.filter(u => u._id !== )
         return res.status(200).json(user)
     } catch(err) {
         res.status(500).json("error occur")
@@ -50,5 +59,31 @@ export const updateProfile = async (req, res) => {
         return res.status(200).json("Uploaded")
     } catch(err) {
         res.status(500).json("error occur")
+    }
+}
+
+
+export const blockUser = async (req, res) => {
+    const { blockUserId } = req.params
+    if(!req.userId.id) return res.status(404).json("Id not found")
+    
+    try {
+        const [user, block] = await Promise.all([
+            User.findById(req.userId.id).select("-password"),
+            User.findById(blockUserId).select("-password")
+        ])
+        if(!user && !block) {
+            return res.status(404).json("User not found.")
+        }
+        const blockedUserDetails = {
+            fullname: block.fullname,
+            id: block._id,
+            profile: block.profile
+        }
+        user.blockUser.push(blockedUserDetails)
+        await user.save()
+        return res.status(200).json(`${block.fullname} was blocked successfully.`)
+    } catch(err) {
+        return res.status(500).json("Internal Server Error.")
     }
 }
