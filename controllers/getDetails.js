@@ -1,4 +1,7 @@
 import User from "../models/user.js"
+import MessageModel from "../models/message.js"
+import { getIo } from "../socket.io.js"
+
 
 export const getUser = async (req, res) => {
     const id  = req.params.userId
@@ -36,8 +39,14 @@ export const getRegisteredUsers = async (req, res) => {
         if(userId !== id) return res.status(400).json("You can't access this route")
 
         const user = users.filter(user => user._id.toString() !== userId)
-        // user.filter(u => u._id !== )
-        return res.status(200).json(user)
+        if(userData.blockUser.length === 0) {
+            return res.status(200).json(user)
+        }
+        let filteredUser;
+        for(const b of userData.blockUser) {
+            filteredUser = user.filter(u => u._id !== b._id)
+        }
+        return res.status(200).json(filteredUser)
     } catch(err) {
         res.status(500).json("error occur")
     }
@@ -85,5 +94,113 @@ export const blockUser = async (req, res) => {
         return res.status(200).json(`${block.fullname} was blocked successfully.`)
     } catch(err) {
         return res.status(500).json("Internal Server Error.")
+    }
+}
+
+export const clearExistingChat = async (req, res) => {
+    const { chatUserId } = req.params
+    if(!req.userId.id) return res.status(404).json("Id not found")
+
+    let user;
+    let chatData;
+    try {
+        const [userData, chatUserData] = await Promise.all([
+            User.findById(req.userId.id).select("-password").populate("messages"),
+            User.findById(chatUserId).select("-password").populate("messages")
+        ])
+
+        if(!userData && !chatUserData) {
+            return res.status(404).json("User not found.")
+        }
+        user = userData;
+        chatData = chatUserData;
+    } catch(err) {
+        return res.status(500).json("Error occurred.")
+    }
+
+    console.log("user", user)
+    console.log("chatUserToClear", chatData)
+    try {
+        const conversation = await MessageModel.findOne({
+            $or: [
+                { creatorId: user._id, receiverId: chatData._id },
+                { creatorId: chatData._id, receiverId: user._id }
+            ]
+        })
+        console.log("Conv", conversation)
+        if(user.messages.length === 0 && chatData.messages.length !== 0 
+            || user.messages.length !== 0 && chatData.messages.length === 0 ) {
+                if(user.messages.length === 0 || chatData.messages.length === 0) {
+                    return res.status(400).json("You don't have any existing message with this user.")
+                }
+                user.message.pull(conversation._id)
+                chatData.message.pull(conversation._id)
+                await Promise.all([
+                    user.save(),
+                    chatData.save(),
+                ])
+                // delete all conversation between the two users and save to db.
+                // this is => conversation.deleteOne() to delete all conversations document.
+                conversation.deleteOne(conversation._id)
+               
+                return res.status(200).json("Conversations deleted.")
+            }
+
+    } catch(err) {
+        return res.status(500).json("Error Occurred On Server.")
+    }
+}
+
+
+export const deleteSingleExistingChat = async (req, res) => {
+    const { chatUserId, messageId } = req.params
+    if(!req.userId.id) return res.status(404).json("Id not found")
+
+    let user;
+    let chatData;
+    try {
+        const [userData, chatUserData] = await Promise.all([
+            User.findById(req.userId.id).select("-password"),
+            User.findById(chatUserId).select("-password")
+        ])
+
+        if(!userData && !chatUserData) {
+            return res.status(404).json("User not found.")
+        }
+        user = userData;
+        chatData = chatUserData;
+    } catch(err) {
+        return res.status(500).json("Error occurred.")
+    }
+
+    console.log("user", user)
+    console.log("chatUserToClear", chatData)
+    try {
+        const conversation = await MessageModel.findOne({
+            $or: [
+                { creatorId: user._id, receiverId: chatData._id },
+                { creatorId: chatData._id, receiverId: user._id }
+            ]
+        })
+        console.log("Conv", conversation)
+        const filteredMessage = conversation.conversation.filter(chat => chat.senderId.toString() === req.userId.id)
+        if(filteredMessage.length === 0) {
+            return res.status(404).json("No chat found for this user.")
+        }
+        conversation.conversation = filteredMessage.filter(m => m.id !== messageId)
+        console.log("messageId", messageId)
+        console.log("filteredMessage", filteredMessage)
+        // console.log("filteredMessage", deletedMessage)
+        // filteredMessage.pull(messageId)
+        getIo().emit("deletedMessage", {
+            action: { id: user._id }, 
+            message: "Message deleted." 
+        })
+        // console.log("DELETED_MESSAGE", deletedMessage)
+        await conversation.save()
+        return res.status(200).json("Message deleted.")
+    } catch(err) {
+        console.log(err.message)
+        return res.status(500).json("Error Occurred On Server.")
     }
 }
