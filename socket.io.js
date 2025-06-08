@@ -19,7 +19,6 @@ export const init = (httpServer) => {
 
 //getting or rendering socket.io
 export const getIo = () => {
-
     if(!io) return
     return io;
 }
