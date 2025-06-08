@@ -4,7 +4,9 @@ import { body, check } from 'express-validator'
 
 import upload from '../middleware/file-upload.js'
 import { signup, signin } from '../controllers/auth.js'
-import { getUser, updateProfile, getRegisteredUsers, blockUser } from '../controllers/getDetails.js'
+import { getUser, updateProfile, 
+    getRegisteredUsers, blockUser, deleteSingleExistingChat,
+    clearExistingChat } from '../controllers/getDetails.js'
 import { getConversations, sendMessage } from '../controllers/message.js'
 import AuthorizationMiddleware from "../middleware/auth.js"
 
@@ -26,13 +28,12 @@ router.get("/user/:userId",
     AuthorizationMiddleware, getUser) 
 
 //router to get all registered users /user/users/:id
-router.get("/users/:id", 
-    AuthorizationMiddleware,
+router.get("/users/:id", AuthorizationMiddleware, 
     getRegisteredUsers) // => filtered out Blocked users.
 
 //router to update new photo
 router.patch("/user/update/profile", AuthorizationMiddleware,
-    upload.single("updateProfile"), updateProfile)
+    upload.single("updateProfile"), updateProfile) //continue with the connecting to frontend
 
 //router to get server message from sender & receiver.
 //route is /user/get/server/message
@@ -46,6 +47,13 @@ router.patch("/send/message/:creatorId/:receiverId",
     AuthorizationMiddleware, check("message"), sendMessage)
 
 //router to block user. => /user/block/:blockUserId
-router.get("/block/:blockUserId", AuthorizationMiddleware, blockUser)
+router.get("/block/:blockUserId", AuthorizationMiddleware, blockUser) //connect or add to frontend
+
+//route to clear chat => /user/delete/:id
+router.delete("/delete/:chatUserId", AuthorizationMiddleware, clearExistingChat) //connect or add to frontend
+
+// route to delete a single chat base on the creatorId and chatId => /user/single/chat/delete/:chatUserId/:messageId
+router.delete("/single/chat/delete/:chatUserId/:messageId", 
+    AuthorizationMiddleware, deleteSingleExistingChat) // connect to frontend and restrict other user from deleting others chat.
 
 export default router;
