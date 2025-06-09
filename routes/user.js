@@ -6,7 +6,7 @@ import upload from '../middleware/file-upload.js'
 import { signup, signin } from '../controllers/auth.js'
 import { getUser, updateProfile, 
     getRegisteredUsers, blockUser, deleteSingleExistingChat,
-    clearExistingChat } from '../controllers/getDetails.js'
+    clearAllExistingChat } from '../controllers/getDetails.js'
 import { getConversations, sendMessage } from '../controllers/message.js'
 import AuthorizationMiddleware from "../middleware/auth.js"
 
@@ -50,7 +50,7 @@ router.patch("/send/message/:creatorId/:receiverId",
 router.get("/block/:blockUserId", AuthorizationMiddleware, blockUser) //connect or add to frontend
 
 //route to clear chat => /user/delete/:id
-router.delete("/delete/:chatUserId", AuthorizationMiddleware, clearExistingChat) //connect or add to frontend
+router.delete("/delete/:chatUserId", AuthorizationMiddleware, clearAllExistingChat) //connect or add to frontend
 
 // route to delete a single chat base on the creatorId and chatId => /user/single/chat/delete/:chatUserId/:messageId
 router.delete("/single/chat/delete/:chatUserId/:messageId", 
