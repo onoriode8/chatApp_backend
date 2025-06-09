@@ -1,3 +1,5 @@
+import { startSession } from "mongoose"
+
 import User from "../models/user.js"
 import MessageModel from "../models/message.js"
 import { getIo } from "../socket.io.js"
@@ -97,7 +99,7 @@ export const blockUser = async (req, res) => {
     }
 }
 
-export const clearExistingChat = async (req, res) => {
+export const clearAllExistingChat = async (req, res) => {
     const { chatUserId } = req.params
     if(!req.userId.id) return res.status(404).json("Id not found")
 
@@ -117,9 +119,7 @@ export const clearExistingChat = async (req, res) => {
     } catch(err) {
         return res.status(500).json("Error occurred.")
     }
-
-    console.log("user", user)
-    console.log("chatUserToClear", chatData)
+    const session = await startSession()
     try {
         const conversation = await MessageModel.findOne({
             $or: [
@@ -127,26 +127,33 @@ export const clearExistingChat = async (req, res) => {
                 { creatorId: chatData._id, receiverId: user._id }
             ]
         })
-        console.log("Conv", conversation)
+        session.startTransaction()
         if(user.messages.length === 0 && chatData.messages.length !== 0 
             || user.messages.length !== 0 && chatData.messages.length === 0 ) {
-                if(user.messages.length === 0 || chatData.messages.length === 0) {
+                if(user.messages.length === 0 && chatData.messages.length === 0) {
+                    await session.abortTransaction()
+                    await session.endSession()
                     return res.status(400).json("You don't have any existing message with this user.")
                 }
-                user.message.pull(conversation._id)
-                chatData.message.pull(conversation._id)
-                await Promise.all([
-                    user.save(),
-                    chatData.save(),
-                ])
-                // delete all conversation between the two users and save to db.
-                // this is => conversation.deleteOne() to delete all conversations document.
-                conversation.deleteOne(conversation._id)
-               
-                return res.status(200).json("Conversations deleted.")
+                if(user.messages.length !== 0) {
+                    user.messages.pull(conversation._id)
+                    await user.save({session})
+                    await conversation.deleteOne(conversation._id).session(session)
+                    await session.commitTransaction()
+                    return res.status(200).json("Conversations deleted.")
+                } else if(chatData.messages.length !== 0) {
+                    chatData.messages.pull(conversation._id)
+                    await chatData.save({session})
+                    await conversation.deleteOne(conversation._id).session(session)
+                    await session.commitTransaction()
+                    return res.status(200).json("Conversations deleted.")
+                }
             }
-
+            res.status(404).json("Sorry you can't access this route at the moment.")
     } catch(err) {
+        await session.abortTransaction()
+        await session.endSession()
+        console.log(err.message)
         return res.status(500).json("Error Occurred On Server.")
     }
 }
@@ -173,8 +180,6 @@ export const deleteSingleExistingChat = async (req, res) => {
         return res.status(500).json("Error occurred.")
     }
 
-    console.log("user", user)
-    console.log("chatUserToClear", chatData)
     try {
         const conversation = await MessageModel.findOne({
             $or: [
@@ -182,25 +187,21 @@ export const deleteSingleExistingChat = async (req, res) => {
                 { creatorId: chatData._id, receiverId: user._id }
             ]
         })
-        console.log("Conv", conversation)
-        const filteredMessage = conversation.conversation.filter(chat => chat.senderId.toString() === req.userId.id)
+        if(!conversation) return res.status(404).json("No conversation between users.")
+        const filteredMessage = conversation.conversation.filter(
+            chat => chat.senderId.toString() === req.userId.id && chat.id === messageId
+        )
         if(filteredMessage.length === 0) {
-            return res.status(404).json("No chat found for this user.")
+            return res.status(400).json("You can't delete this message.")
         }
-        conversation.conversation = filteredMessage.filter(m => m.id !== messageId)
-        console.log("messageId", messageId)
-        console.log("filteredMessage", filteredMessage)
-        // console.log("filteredMessage", deletedMessage)
-        // filteredMessage.pull(messageId)
+        conversation.conversation = conversation.conversation.filter(m => m.id !== messageId.toString())
         getIo().emit("deletedMessage", {
             action: { id: user._id }, 
             message: "Message deleted." 
         })
-        // console.log("DELETED_MESSAGE", deletedMessage)
         await conversation.save()
         return res.status(200).json("Message deleted.")
     } catch(err) {
-        console.log(err.message)
         return res.status(500).json("Error Occurred On Server.")
     }
 }
