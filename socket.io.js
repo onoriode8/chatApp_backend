@@ -9,7 +9,7 @@ let io;
 export const init = (httpServer) => {
     io = new Server(httpServer, {
         cors: {
-            origin: process.env.FRONTEND_PORT
+            origin: [process.env.FRONTEND_PORT, "http://localhost:5000"]
         } 
     })
 
