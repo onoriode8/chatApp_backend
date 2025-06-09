@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 
 const authorization = (req, res, next) => {
     try {
+        if(!req.headers.authorization) return res.status(400).json("Token must be provided.")
         const token = req.headers.authorization.split(" ")[1];
         if(!token) throw new Error("Empty token provided")
         const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN)
