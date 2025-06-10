@@ -38,7 +38,7 @@ export const getConversations = async (req, res) => {
       pushArray.push(conversation)
       return res.status(200).json(pushArray) 
     }
-    return res.status(200).json(creatorUser.messages);//return an array of messages.
+    return res.status(200).json(creatorUser.messages);
   } catch (err) {
     return res.status(500).json("Internal Server Error");
   }
@@ -107,7 +107,6 @@ export const sendMessage = async (req, res) => {
 
     conversation.conversation.push(messagesCreated)
 
-    //emit socket event to users.
     getIo().emit("message", {
       conversation
     })

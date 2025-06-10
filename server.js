@@ -28,34 +28,29 @@ server.use(morgan("combined", { stream: accessLogStream }))
 server.use(express.json());
 
 server.use(cors({
-    origin: [process.env.FRONTEND_PORT, "http://localhost:3000"], 
+    origin: process.env.FRONTEND_PORT,
     methods: ["GET, POST, PATCH, DELETE, PUT"],
     credentials: true
 }))
 
 
-//serves image file dynamically.
 server.use("/uploads/images", express.static(path.join(__dirname, "uploads/images")))
 
 server.use("/user", userRoutes)
-
-//server.use("/admin", adminRoutes)
-
 
 server.use((req, res) => {
     return res.status(404).json({})
 })
 
-//routes to catch server error.
+
 server.use((error, req, res, next) => {
     if(req.file) {
         fs.unlink(req.file.path, (err) => {
-            console.log('File deleted.');
+            return res.status(400).json("")
         })
     }
 })
 
-// console.log()
 mongoose.connect(process.env.DB_URL)
     .then(res => {
         const httpServer = server.listen(process.env.PORT, () => {

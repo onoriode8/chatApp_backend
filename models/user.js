@@ -10,7 +10,13 @@ const userSchema = new mongoose.Schema({
         { type: mongoose.Schema.Types.ObjectId,
          ref: "Conversations"} 
     ],
-    blockUser: []
+    blockUser: [
+        {
+            fullname: { type: String, trim: true },
+            id: { type: mongoose.Schema.Types.ObjectId, trim: true },
+            profile: { type: String, trim: true }
+        }
+    ]
 })
 
 const userModel = new mongoose.model("Users", userSchema)
