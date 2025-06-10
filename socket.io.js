@@ -10,7 +10,6 @@ export const init = (httpServer) => {
             origin: process.env.FRONTEND_URL
         } 
     })
-
     return io
 }
 
