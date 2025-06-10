@@ -26,7 +26,7 @@ const accessLogStream = fs.createWriteStream(
 
 server.use(morgan("combined", { stream: accessLogStream }))
 server.use(express.json());
-const url = "http://localhost:3000"
+const url = http://localhost:3000
 server.use(cors({
     origin: [process.env.FRONTEND_URL, url],
     methods: ["GET, POST, PATCH, DELETE, PUT"],
