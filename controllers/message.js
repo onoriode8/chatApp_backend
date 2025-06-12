@@ -82,7 +82,7 @@ export const sendMessage = async (req, res) => {
     const messagesCreated = {
       id: uuidv4(),
       message, 
-      file: req.file.path,
+      file: req.file ? req.file.path : req.file,
       senderId: existingSender._id,
       createdAt: new Date(),
       time: time
@@ -116,7 +116,7 @@ export const sendMessage = async (req, res) => {
     
     return res.status(201).json(conversation) 
   } catch (err) {
-    return res.status(500).json(err.message);
+    return res.status(500).json("Internal Server Error");
   }
 }
 
