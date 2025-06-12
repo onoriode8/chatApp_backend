@@ -26,7 +26,6 @@ const accessLogStream = fs.createWriteStream(
 server.use(morgan("combined", { stream: accessLogStream }))
 server.use(express.json());
 
-
 server.use(cors({
     origin: process.env.FRONTEND_URL,
     methods: ["GET, POST, PATCH, DELETE, PUT"],
@@ -40,7 +39,6 @@ server.use("/user", userRoutes)
 server.use((req, res) => {
     return res.status(404).json({})
 })
-
 
 server.use((error, req, res, next) => {
     if(req.file) {
