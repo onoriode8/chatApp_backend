@@ -116,7 +116,7 @@ export const sendMessage = async (req, res) => {
     
     return res.status(201).json(conversation) 
   } catch (err) {
-    return res.status(500).json("Internal Server Error");
+    return res.status(500).json(err.message);
   }
 }
 
