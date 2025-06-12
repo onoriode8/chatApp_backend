@@ -8,6 +8,8 @@
 ### Built Restful APIs with Express and MongoDB, implemented real-time chat using Socket.io.
 ### Improved app performance by optimizing React components and backend queries.
 ### Integrated authentication with JWT.
+### Implemented rate limit for preventing too many requests to the server.
+### Stored uploaded images to cloudinary for scalable and reliable storage and querying.
 ### Deployed Frontend application using Vercel and Backend with Render
 
 

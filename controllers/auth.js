@@ -1,14 +1,15 @@
 import { validationResult } from 'express-validator'
 import bcryptjs from 'bcryptjs'
 import JsonWebToken from 'jsonwebtoken'
-import fs from 'fs'
 
 import User from '../models/user.js'
 
 
 export const signup = async (req, res) => {
     const { email, password } = req.body
-
+    if(!req.file) {
+        return res.status(400).json("File not provided.")
+    }
     email.toLowerCase()
     const result = validationResult(req)
     if(!result.isEmpty()) {
@@ -29,7 +30,7 @@ export const signup = async (req, res) => {
             email: email,
             password: hashedPassword,
             fullname,
-            profile: `${process.env.BACKEND_URL}/uploads/images/${req.file.filename}`,
+            profile: req.file.path,
             messages: [],
             blockUser: []
         })

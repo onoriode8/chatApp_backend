@@ -82,6 +82,7 @@ export const sendMessage = async (req, res) => {
     const messagesCreated = {
       id: uuidv4(),
       message, 
+      file: req.file.path,
       senderId: existingSender._id,
       createdAt: new Date(),
       time: time
@@ -117,4 +118,77 @@ export const sendMessage = async (req, res) => {
   } catch (err) {
     return res.status(500).json("Internal Server Error");
   }
-};
+}
+
+export const sendFileHandler = async (req, res) => {
+  const file = req.file;
+  const userId = req.userId.id;
+  const { creatorId, receiverId } = req.params
+  if(!file) {
+    return res.status(400).json("File not sent.")
+  }
+
+  try {
+    const [existingSender, existingReceiver] = await Promise.all([
+        UserModel.findById(creatorId),
+        UserModel.findById(receiverId)
+    ])
+        
+    if(!existingSender && !existingReceiver) {
+        return res.status(404).json("Not Found")
+    }
+
+    if(userId !== existingSender._id.toString()) {
+        return res.status(400).json("You can't send file to this user.")
+    }
+    
+    const conversation = await Message.findOne({
+      $or: [
+        { creatorId: creatorId, receiverId: receiverId },
+        { creatorId: receiverId, receiverId: creatorId }
+      ]
+    })
+
+    const date = new Date()
+    const time = date.toString().split(" ")[4]
+    
+    const messagesCreated = {
+      id: uuidv4(),
+      message: req.file.fieldname,
+      file: req.file.path,
+      senderId: existingSender._id,
+      createdAt: new Date(),
+      time: time
+    }
+
+    const id = getSocketClientId()
+
+    if(!conversation) {
+      const createdConversation = new Message({
+          creatorId: creatorId,  
+          receiverId: receiverId,
+          conversation: [messagesCreated]
+      })
+      
+      getIo().emit("message", {
+        conversation: createdConversation
+      })
+      await createdConversation.save()
+      existingSender.messages.push(createdConversation._id)
+      await existingSender.save()
+      return res.status(201).json(createdConversation)
+    }
+
+    conversation.conversation.push(messagesCreated)
+
+    getIo().emit("message", {
+      conversation
+    })
+
+    await conversation.save() 
+    
+    return res.status(201).json(conversation) 
+  } catch (err) {
+    return res.status(500).json("Internal Server Error");
+  }
+}

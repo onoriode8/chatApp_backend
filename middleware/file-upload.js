@@ -8,6 +8,10 @@ const fileUpload = multer({
         },
         filename: (req, file, cb) => {
             const extension = file.mimetype.split("/")[1];
+            if(!extension) {
+                const error = new Error("File not supported.")
+                return cb(error, false)
+            }
             const fileName = uuidv4() + "." + extension;
             cb(null, fileName)
         }

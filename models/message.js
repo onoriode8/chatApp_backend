@@ -14,6 +14,7 @@ const messageSchema = new mongoose.Schema({
         {
             id: { type: String, required: true, trim: true },
             message: { type: String, required: true, trim: true }, 
+            file: { type: String },
             senderId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Users" },
             createdAt: { type: Date, required: true, trim: true },
             time: { type: String, required: true, trim: true }

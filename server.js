@@ -9,7 +9,6 @@ import helmet from 'helmet'
 import compression from 'compression'
 import morgan from 'morgan'
 
-
 import { init, socketId } from './socket.io.js'
 import userRoutes from './routes/user.js'
 
@@ -26,13 +25,13 @@ const accessLogStream = fs.createWriteStream(
 
 server.use(morgan("combined", { stream: accessLogStream }))
 server.use(express.json());
-const url = http://localhost:3000
+
+
 server.use(cors({
-    origin: [process.env.FRONTEND_URL, url],
+    origin: process.env.FRONTEND_URL,
     methods: ["GET, POST, PATCH, DELETE, PUT"],
     credentials: true
 }))
-
 
 server.use("/uploads/images", express.static(path.join(__dirname, "uploads/images")))
 

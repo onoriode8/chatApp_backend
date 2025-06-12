@@ -64,7 +64,7 @@ export const updateProfile = async (req, res) => {
     try {
         const userDetails = await User.findById({ _id: userId })
         if(!userDetails) return res.status(404).json("User not found")
-        userDetails.profile = req.file.filename
+        userDetails.profile = req.file.path
         await userDetails.save()
         
         return res.status(200).json("Uploaded")
@@ -149,11 +149,10 @@ export const clearAllExistingChat = async (req, res) => {
                     return res.status(200).json("Conversations deleted.")
                 }
             }
-            res.status(404).json("Sorry you can't access this route at the moment.")
+            return res.status(404).json("Sorry you can't access this route at the moment.")
     } catch(err) {
         await session.abortTransaction()
         await session.endSession()
-        console.log(err.message)
         return res.status(500).json("Error Occurred On Server.")
     }
 }
